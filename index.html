@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>הכנה למבחן מצטיינים — מתמטיקה</title>
+<style>
+  :root {
+    --green:       #1D9E75;
+    --green-light: #E1F5EE;
+    --green-mid:   #9FE1CB;
+    --green-dark:  #0F6E56;
+    --green-deep:  #085041;
+    --amber:       #EF9F27;
+    --amber-light: #FAEEDA;
+    --amber-mid:   #FAC775;
+    --amber-dark:  #633806;
+    --blue:        #378ADD;
+    --blue-light:  #E6F1FB;
+    --blue-dark:   #0C447C;
+    --purple:      #7F77DD;
+    --purple-light:#EEEDFE;
+    --purple-dark: #3C3489;
+    --gray-bg:     #F7F6F2;
+    --gray-border: rgba(0,0,0,0.1);
+    --gray-text:   #5F5E5A;
+    --text:        #1a1a18;
+    --radius:      10px;
+    --radius-sm:   6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+    background: var(--gray-bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 3rem;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: white;
+    border-bottom: 0.5px solid var(--gray-border);
+    padding: 1rem 1.25rem;
+    text-align: center;
+    position: sticky; top: 0; z-index: 10;
+  }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header p  { font-size: 13px; color: var(--gray-text); margin-top: 3px; }
+
+  /* ── DAY TABS ── */
+  .day-tabs {
+    display: flex; gap: 8px; overflow-x: auto;
+    padding: 1rem 1rem 0;
+    scrollbar-width: none;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex-shrink: 0; padding: 7px 16px;
+    border-radius: 999px; font-size: 13px; font-weight: 500;
+    border: 1.5px solid var(--gray-border);
+    background: white; color: var(--gray-text);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .day-tab.active  { background: var(--green); border-color: var(--green); color: white; }
+  .day-tab.done    { background: var(--green-light); border-color: var(--green-mid); color: var(--green-deep); }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { padding: 10px 1rem 0; }
+  .progress-track { background: var(--gray-border); border-radius: 999px; height: 5px; }
+  .progress-fill  { background: var(--green); border-radius: 999px; height: 5px; transition: width 0.4s; }
+
+  /* ── MAIN ── */
+  main { padding: 1rem; max-width: 700px; margin: 0 auto; }
+
+  /* ── DAY HEADER CARD ── */
+  .day-header-card {
+    background: white; border-radius: var(--radius);
+    border: 0.5px solid var(--gray-border);
+    padding: 1rem 1.25rem; margin-bottom: 1rem;
+  }
+  .day-header-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge-day {
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    background: var(--green-light); color: var(--green-deep);
+    border: 0.5px solid var(--green-mid); border-radius: 999px;
+  }
+  .day-title { font-size: 17px; font-weight: 600; }
+  .day-meta  { font-size: 13px; color: var(--gray-text); margin-top: 4px; }
+  .topics-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .topic-chip {
+    font-size: 12px; padding: 3px 10px; border-radius: 999px;
+    background: var(--gray-bg); border: 0.5px solid var(--gray-border);
+    color: var(--gray-text);
+  }
+  .day-tip {
+    margin-top: 12px; padding: 10px 12px;
+    background: var(--amber-light); border: 0.5px solid var(--amber-mid);
+    border-radius: var(--radius-sm); font-size: 13px; color: var(--amber-dark);
+    line-height: 1.6;
+  }
+
+  /* ── EXERCISE CARD ── */
+  .exercise-card {
+    background: white; border-radius: var(--radius);
+    border: 0.5px solid var(--gray-border);
+    margin-bottom: 1rem; overflow: hidden;
+  }
+  .ex-top {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 0.5px solid var(--gray-border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ex-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--green); color: white;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ex-meta { flex: 1; }
+  .ex-type { font-size: 13px; font-weight: 500; color: var(--text); }
+  .ex-time { font-size: 12px; color: var(--gray-text); margin-top: 1px; }
+
+  .ex-body { padding: 1rem 1.25rem; }
+  .ex-question { font-size: 14px; line-height: 1.75; white-space: pre-line; color: var(--text); }
+
+  /* ── ACTION BUTTONS ── */
+  .ex-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn-hint, .btn-method {
+    font-size: 12px; padding: 5px 12px; border-radius: 999px;
+    border: 1px solid; cursor: pointer; font-weight: 500; transition: all 0.12s;
+  }
+  .btn-hint {
+    background: var(--amber-light); border-color: var(--amber-mid); color: var(--amber-dark);
+  }
+  .btn-hint:hover { background: #FAC775; }
+  .btn-method {
+    background: var(--blue-light); border-color: #B5D4F4; color: var(--blue-dark);
+  }
+  .btn-method:hover { background: #B5D4F4; }
+  .btn-solution {
+    background: var(--green-light); border-color: var(--green-mid); color: var(--green-deep);
+  }
+  .btn-solution:hover { background: var(--green-mid); }
+
+  /* ── SOLUTION PANEL ── */
+  .panel.solution-panel {
+    background: #F4FBF8; border: 1px solid var(--green-mid); color: var(--text);
+    padding: 14px 16px;
+  }
+  .sol-answer {
+    font-size: 14px; font-weight: 600; color: var(--green-deep);
+    background: var(--green-light); border-radius: var(--radius-sm);
+    padding: 10px 12px; margin-bottom: 12px; line-height: 1.6;
+    border: 0.5px solid var(--green-mid);
+  }
+  .sol-way { margin-top: 12px; border-top: 0.5px solid var(--green-mid); padding-top: 10px; }
+  .sol-way-label {
+    font-size: 12px; font-weight: 700; color: var(--green-dark);
+    letter-spacing: 0.4px; margin-bottom: 8px;
+  }
+  .sol-steps {
+    font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+    font-size: 13px; line-height: 1.8; color: var(--text);
+    background: white;
+    border: 0.5px solid var(--green-mid); border-radius: var(--radius-sm);
+    padding: 10px 12px; margin: 0;
+    direction: rtl; text-align: right;
+  }
+
+  /* ── PANELS (hint / method) ── */
+  .panel {
+    margin: 0 1.25rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 13px; line-height: 1.7;
+    display: none;
+  }
+  .panel.hint-panel {
+    background: var(--amber-light); border: 0.5px solid var(--amber-mid); color: var(--amber-dark);
+    padding: 10px 14px;
+  }
+  .panel.method-panel {
+    background: var(--blue-light); border: 0.5px solid #B5D4F4; color: var(--blue-dark);
+    padding: 12px 16px;
+  }
+  .panel.method-panel h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+  .panel.method-panel ol { padding-right: 18px; }
+  .panel.method-panel ol li { margin-bottom: 6px; }
+  .panel.method-panel .rule-box {
+    background: white; border: 0.5px solid #B5D4F4;
+    border-radius: var(--radius-sm); padding: 8px 10px; margin-top: 10px;
+    font-size: 13px;
+  }
+
+  /* ── ANSWER CHECK ── */
+  .answer-check {
+    margin: 0.75rem 1.25rem 0;
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .answer-input {
+    flex: 1; min-width: 120px; padding: 8px 12px;
+    border: 1.5px solid var(--gray-border); border-radius: var(--radius-sm);
+    font-size: 14px; direction: rtl; text-align: right;
+    outline: none; transition: border-color 0.15s;
+  }
+  .answer-input:focus { border-color: var(--green); }
+  .answer-input.correct { border-color: var(--green); background: var(--green-light); }
+  .answer-input.wrong   { border-color: #e05c5c;    background: #fef0f0; }
+  .btn-check {
+    padding: 8px 16px; border-radius: var(--radius-sm);
+    background: var(--green); color: white;
+    border: none; font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; transition: background 0.15s;
+  }
+  .btn-check:hover { background: var(--green-dark); }
+  .check-result {
+    width: 100%; font-size: 13px; margin-top: 4px; padding: 6px 10px;
+    border-radius: var(--radius-sm); display: none;
+  }
+  .check-result.correct { background: var(--green-light); color: var(--green-deep); border: 0.5px solid var(--green-mid); }
+  .check-result.wrong   { background: #fef0f0; color: #7a1a1a; border: 0.5px solid #f5b8b8; }
+
+  /* ── MOCK EXAM badge ── */
+  .badge-day.mock { background: #F0EAFE; color: var(--purple-dark); border-color: #C4B8F8; }
+    background: #e0e0e0; color: #aaa; cursor: not-allowed;
+  }
+  .send-divider {
+    border-top: 0.5px solid var(--gray-border);
+    padding-top: 1rem; margin-top: 0.5rem;
+  }
+  .send-label { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .send-sub   { font-size: 13px; color: var(--gray-text); margin-bottom: 12px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 100;
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: var(--radius);
+    max-width: 480px; width: 100%; max-height: 85vh;
+    overflow-y: auto; padding: 1.5rem;
+    position: relative;
+  }
+  .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--blue-dark); }
+  .modal-close {
+    position: absolute; top: 12px; left: 14px;
+    background: none; border: none; font-size: 20px;
+    color: var(--gray-text); cursor: pointer; line-height: 1;
+  }
+  .modal ol { padding-right: 20px; }
+  .modal ol li { font-size: 14px; line-height: 1.7; margin-bottom: 6px; color: var(--text); }
+  .modal .rule-highlight {
+    background: var(--blue-light); border-right: 3px solid var(--blue);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 8px 12px; margin: 10px 0; font-size: 13px; color: var(--blue-dark);
+    font-weight: 500;
+  }
+  .modal .example-box {
+    background: var(--green-light); border: 0.5px solid var(--green-mid);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    font-size: 13px; color: var(--green-deep); margin-top: 10px; line-height: 1.7;
+  }
+
+  @media (max-width: 480px) {
+    main { padding: 0.75rem; }
+    .ex-question { font-size: 13px; }
+    .day-title { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎯 הכנה למבחן מצטיינים</h1>
+  <p>חוף השרון · מתמטיקה · 45 דקות ביום</p>
+</header>
+
+<div class="day-tabs" id="dayTabs"></div>
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<main id="mainContent"></main>
+
+<!-- METHOD MODAL -->
+<div class="modal-overlay" id="methodModal" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ── METHOD CONTENT ─────────────────────────────────────────────
+const methods = {
+  percent_basic: {
+    title: "שיטה: אחוזים — טבלת ערך משולש",
+    html: `
+      <div class="rule-highlight">הטבלה תמיד נראית כך — שני עמודות: אחוזים | מספר</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;">
+        <tr style="background:#E6F1FB">
+          <th style="border:1px solid #B5D4F4;padding:6px 10px;text-align:center"></th>
+          <th style="border:1px solid #B5D4F4;padding:6px 10px;text-align:center">אחוזים</th>
+          <th style="border:1px solid #B5D4F4;padding:6px 10px;text-align:center">מספר</th>
+        </tr>
+        <tr>
+          <td style="border:1px solid #B5D4F4;padding:6px 10px;font-weight:600">חלק</td>
+          <td style="border:1px solid #B5D4F4;padding:6px 10px;text-align:center;color:#0C447C">?</td>
+          <td style="border:1px solid #B5D4F4;padding:6px 10px;text-align:center">ידוע</td>
+        </tr>
+        <tr style="background:#F7F6F2">
+          <td style="border:1px solid #B5D4F4;padding:6px 10px;font-weight:600">שלם</td>
+          <td style="border:1px solid #B5D4F4;padding:6px 10px;text-align:center">100</td>
+          <td style="border:1px solid #B5D4F4;padding:6px 10px;text-align:center">ידוע</td>
+        </tr>
+      </table>
+      <ol style="margin-top:10px">
+        <li>ממלאים את שלושת הנתונים הידועים בטבלה. ה-? הוא מה שמחפשים.</li>
+        <li><strong>כלל החישוב:</strong> כופלים את שני המספרים באלכסון שמכיל את ה-?, ומחלקים במספר השלישי.</li>
+      </ol>
+      <div class="rule-highlight">? = (שני הנתונים האחרים באלכסון) ÷ המספר שנשאר</div>
+      <div class="example-box">
+        <strong>סוג א: מה הם 30% מ-200?</strong><br>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0">
+          <tr style="background:#E1F5EE"><th style="border:1px solid #9FE1CB;padding:4px 8px"></th><th style="border:1px solid #9FE1CB;padding:4px 8px">אחוזים</th><th style="border:1px solid #9FE1CB;padding:4px 8px">מספר</th></tr>
+          <tr><td style="border:1px solid #9FE1CB;padding:4px 8px">חלק</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0F6E56;font-weight:700">30</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0C447C;font-weight:700">?</td></tr>
+          <tr style="background:#F4FBF8"><td style="border:1px solid #9FE1CB;padding:4px 8px">שלם</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">100</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">200</td></tr>
+        </table>
+        ? = 30 × 200 ÷ 100 = <strong>60</strong><br><br>
+        <strong>סוג ב: 60 הם כמה אחוז מ-200?</strong><br>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0">
+          <tr style="background:#E1F5EE"><th style="border:1px solid #9FE1CB;padding:4px 8px"></th><th style="border:1px solid #9FE1CB;padding:4px 8px">אחוזים</th><th style="border:1px solid #9FE1CB;padding:4px 8px">מספר</th></tr>
+          <tr><td style="border:1px solid #9FE1CB;padding:4px 8px">חלק</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0C447C;font-weight:700">?</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0F6E56;font-weight:700">60</td></tr>
+          <tr style="background:#F4FBF8"><td style="border:1px solid #9FE1CB;padding:4px 8px">שלם</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">100</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">200</td></tr>
+        </table>
+        ? = 60 × 100 ÷ 200 = <strong>30%</strong><br><br>
+        <strong>סוג ג: 60 הם 30% מכמה?</strong><br>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0">
+          <tr style="background:#E1F5EE"><th style="border:1px solid #9FE1CB;padding:4px 8px"></th><th style="border:1px solid #9FE1CB;padding:4px 8px">אחוזים</th><th style="border:1px solid #9FE1CB;padding:4px 8px">מספר</th></tr>
+          <tr><td style="border:1px solid #9FE1CB;padding:4px 8px">חלק</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">30</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0F6E56;font-weight:700">60</td></tr>
+          <tr style="background:#F4FBF8"><td style="border:1px solid #9FE1CB;padding:4px 8px">שלם</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">100</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0C447C;font-weight:700">?</td></tr>
+        </table>
+        ? = 60 × 100 ÷ 30 = <strong>200</strong>
+      </div>
+    `
+  },
+  percent_double: {
+    title: "שיטה: הנחה כפולה — טבלת ערך משולש",
+    html: `
+      <ol>
+        <li>כל הנחה היא תרגיל נפרד — פותרים בטבלה <strong>שלב אחרי שלב</strong>.</li>
+        <li>התוצאה של הטבלה הראשונה נהיית ה"שלם" בטבלה השנייה.</li>
+        <li>לעולם אל תחברי אחוזים ישירות (15%+15% ≠ 30%).</li>
+      </ol>
+      <div class="example-box">
+        <strong>400 ש"ח, הנחה של 15%, ואחר כך עוד 15%:</strong><br><br>
+        <strong>טבלה 1 — הנחה ראשונה (מה נשאר אחרי 15% הנחה?):</strong><br>
+        <em>אחרי הנחה נשאר 85% מהמחיר</em><br>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0">
+          <tr style="background:#E1F5EE"><th style="border:1px solid #9FE1CB;padding:4px 8px"></th><th style="border:1px solid #9FE1CB;padding:4px 8px">אחוזים</th><th style="border:1px solid #9FE1CB;padding:4px 8px">מספר</th></tr>
+          <tr><td style="border:1px solid #9FE1CB;padding:4px 8px">חלק</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">85</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0C447C;font-weight:700">?</td></tr>
+          <tr style="background:#F4FBF8"><td style="border:1px solid #9FE1CB;padding:4px 8px">שלם</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">100</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">400</td></tr>
+        </table>
+        ? = 85 × 400 ÷ 100 = <strong>340 ש"ח</strong><br><br>
+        <strong>טבלה 2 — הנחה שנייה (על 340, לא על 400!):</strong><br>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin:6px 0">
+          <tr style="background:#E1F5EE"><th style="border:1px solid #9FE1CB;padding:4px 8px"></th><th style="border:1px solid #9FE1CB;padding:4px 8px">אחוזים</th><th style="border:1px solid #9FE1CB;padding:4px 8px">מספר</th></tr>
+          <tr><td style="border:1px solid #9FE1CB;padding:4px 8px">חלק</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">85</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center;color:#0C447C;font-weight:700">?</td></tr>
+          <tr style="background:#F4FBF8"><td style="border:1px solid #9FE1CB;padding:4px 8px">שלם</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">100</td><td style="border:1px solid #9FE1CB;padding:4px 8px;text-align:center">340</td></tr>
+        </table>
+        ? = 85 × 340 ÷ 100 = <strong>289 ש"ח</strong>
+      </div>
+    `
+  },
+  order_of_ops: {
+    title: "שיטה: סדר פעולות החשבון",
+    html: `
+      <div class="rule-highlight">הסדר: סוגריים ← חזקות ← כפל/חילוק ← חיבור/חיסור</div>
+      <ol>
+        <li>קודם כל — פותרים מה שבתוך סוגריים.</li>
+        <li>כפל וחילוק: <strong>מימין לשמאל</strong> — מתחילים מהפעולה הכי ימנית.</li>
+        <li>חיבור וחיסור: גם הם <strong>מימין לשמאל</strong>.</li>
+        <li>כותבים כל שלב בשורה חדשה עם = בסוף השורה.</li>
+      </ol>
+      <div class="example-box" style="direction:rtl; text-align:right;">
+        ‏1 − 2 + 4 × 2 =<br>
+        ‏1 − 2 + 8 =<br>
+        ‏7
+      </div>
+    `
+  },
+  word_problem: {
+    title: "שיטה: בעיה מילולית",
+    html: `
+      <ol>
+        <li><strong>קרי פעמיים</strong> — סמני את כל המספרים והפעולות.</li>
+        <li><strong>מה לא ידוע?</strong> — הגדירי את מה שמחפשים (לפעמים שתיים-שלוש שאלות!).</li>
+        <li><strong>ציירי ציור</strong> — אפילו ציור פשוט מאוד עוזר.</li>
+        <li><strong>עבדי שלב שלב</strong> — אל תנסי לפתור הכל ביחד.</li>
+        <li><strong>בדקי הגיון</strong> — האם התשובה הגיונית בהקשר הסיפור?</li>
+      </ol>
+      <div class="rule-highlight">חשיבה לאחור: לפעמים קל יותר להתחיל מהתוצאה ולחזור לנתון הנדרש</div>
+    `
+  },
+  area_perimeter: {
+    title: "שיטה: שטחים והיקפים",
+    html: `
+      <ol>
+        <li><strong>מלבן:</strong> שטח = אורך × רוחב | היקף = 2 × (אורך + רוחב)</li>
+        <li><strong>ריבוע:</strong> שטח = צלע² | היקף = 4 × צלע</li>
+        <li><strong>שכבות (בריכה באולם):</strong> שרטטי ציור עם מספרים על כל צלע!</li>
+        <li>אם יש שביל/מסגרת ברוחב W — החסרי 2W מכל מימד.</li>
+      </ol>
+      <div class="rule-highlight">
+        בריכה באולם: רוחב בריכה = רוחב אולם − 2 × רוחב שביל
+      </div>
+      <div class="example-box">
+        אולם 18 מ׳ רוחב, שביל 4 מ׳:<br>
+        רוחב בריכה = 18 − 8 = 10 מ׳<br>
+        שטח בריכה = 300 → אורך = 300 ÷ 10 = 30 מ׳<br>
+        אורך אולם = 30 + 8 = 38 מ׳
+      </div>
+    `
+  },
+  sequences: {
+    title: "שיטה: מציאת חוקיות בסדרות",
+    html: `
+      <ol>
+        <li><strong>סדרה חשבונית:</strong> הפרש קבוע בין איברים (לדוגמה: +3 כל פעם).</li>
+        <li><strong>סדרה הנדסית:</strong> מכפלה קבועה בין איברים (לדוגמה: ×2 כל פעם).</li>
+        <li><strong>סדרת ריבועים:</strong> 1, 4, 9, 16 ... (מספרים בריבוע).</li>
+        <li><strong>סדרת פיבונאצ'י:</strong> כל איבר = סכום שני הקודמים.</li>
+        <li>אם לא ברור — חשבי את <em>ההפרשים</em> בין האיברים.</li>
+      </ol>
+      <div class="rule-highlight">אם ההפרש בין ההפרשים קבוע — זו סדרה ריבועית!</div>
+    `
+  },
+  logic: {
+    title: "שיטה: שאלות לוגיקה",
+    html: `
+      <ol>
+        <li><strong>קראי שוב לאט.</strong> כל מילה חשובה.</li>
+        <li><strong>סמני נתונים:</strong> כתבי כל משפט כמשוואה או תנאי.</li>
+        <li><strong>הגדירי משתנה:</strong> "נסמן את X ב..."</li>
+        <li><strong>הצלבי מידע:</strong> מה כל נתון מגלה לנו על האחר?</li>
+        <li><strong>בדקי תשובה:</strong> הכניסי חזרה לכל התנאים המקוריים.</li>
+      </ol>
+      <div class="rule-highlight">טכניקה: כתבי טבלה — שורות = אפשרויות, עמודות = תנאים</div>
+      <div class="example-box">
+        "A = 2B, C = A − 12, סך הכל 108"<br>
+        → B + 2B + (2B − 12) = 108<br>
+        → 5B = 120 → B = 24
+      </div>
+    `
+  },
+  outside_box: {
+    title: "שיטה: חשיבה מחוץ לקופסא",
+    html: `
+      <ol>
+        <li><strong>אל תמהרי.</strong> שאלות אלו לא פותרים מיד — זה בסדר.</li>
+        <li><strong>נסי מקרה פשוט</strong> — מה קורה עם מספרים קטנים?</li>
+        <li><strong>חלקי לתתי-בעיות</strong> — פתרי שלב אחד בכל פעם.</li>
+        <li><strong>חשבי הפוך</strong> — אם הייתי מכירה את התשובה, מה הייתי יודעת?</li>
+        <li><strong>ציור/טבלה</strong> — ויזואליזציה של הבעיה כמעט תמיד עוזרת.</li>
+      </ol>
+      <div class="rule-highlight">בשאלות כמו "המינימום שקילות" — חשבי על הפיצול האופטימלי</div>
+    `
+  },
+  spatial: {
+    title: "שיטה: חשיבה צורנית ומרחבית",
+    html: `
+      <ol>
+        <li><strong>ציירי מה שתיארו</strong> — מבט מלמעלה, מהצד, מלפנים.</li>
+        <li><strong>ספרי שטחים חיצוניים</strong> — בגוף תלת-ממדי: איזו קוביה נגישה מבחוץ?</li>
+        <li><strong>סדרות צורות:</strong> חפשי דפוס — מה גדל? מה חוזר? מה מתחלף?</li>
+        <li><strong>שני כיוונים:</strong> בדקי גם את מספר הצורות וגם את הצורה עצמה.</li>
+      </ol>
+      <div class="rule-highlight">
+        קוביות: בגוף N×N×N, הקוביות הפנימיות = (N−2)³
+      </div>
+      <div class="example-box">
+        גוף 2×2×2 = 8 קוביות.<br>
+        פנימיות: (2−2)³ = 0<br>
+        כולן נראות מבחוץ!
+      </div>
+    `
+  },
+  multistep: {
+    title: "שיטה: בעיות ריבוי שלבים",
+    html: `
+      <ol>
+        <li><strong>זהי את כל השאלות</strong> — קראי מה מבקשים בכל סעיף.</li>
+        <li><strong>רשמי נתונים</strong> — ארגני את כל מה שניתן בצורה מסודרת.</li>
+        <li><strong>עבדי לפי סדר הסעיפים</strong> — לרוב כל סעיף בנוי על הקודם.</li>
+        <li><strong>שמרי תוצאות ביניים</strong> — כתבי כל חישוב בדרך.</li>
+        <li>בסוף — ודאי שעניתי על כל מה שנשאל.</li>
+      </ol>
+      <div class="rule-highlight">טיפ: אם תקועים בסעיף ב — קפצי לסעיף ג, לפעמים הוא מרמז על הפתרון</div>
+    `
+  }
+};
+
+// ── SOLUTIONS ───────────────────────────────────────────────────
+const solutions = {
+  // ═══ יום 1 ═══
+  // שאלה 0: תרגול אחוזים — נעליים
+  "0_0": {
+    answer: "✅ א. 192 ש\"ח  |  ב. 172.80 ש\"ח  |  ג. 28% (לא 30%!)",
+    ways: [{
+      label: "טבלת ערך משולש",
+      steps: `א. נשאר 80% אחרי הנחת 20%:
+┌──────┬────────┬────────┐
+│      │ אחוזים │ מספר   │
+├──────┼────────┼────────┤
+│ חלק  │   80   │   ?    │
+├──────┼────────┼────────┤
+│ שלם  │  100   │  240   │
+└──────┴────────┴────────┘
+? = 80 × 240 ÷ 100 = 192 ש"ח
+
+ב. נשאר 90% אחרי הנחת 10% על 192:
+┌──────┬────────┬────────┐
+│      │ אחוזים │ מספר   │
+├──────┼────────┼────────┤
+│ חלק  │   90   │   ?    │
+├──────┼────────┼────────┤
+│ שלם  │  100   │  192   │
+└──────┴────────┴────────┘
+? = 90 × 192 ÷ 100 = 172.80 ש"ח
+
+ג. 172.80 הם כמה אחוז מ-240?
+? = 172.80 × 100 ÷ 240 = 72%
+→ נשאר 72% = ירידה של 28%`
+    }]
+  },
+
+  // שאלה 1: תרגול אחוזים 2 — ספרייה
+  "0_1": {
+    answer: "✅ א. 42  |  ב. 20%  |  ג. 22.5%",
+    ways: [{
+      label: "טבלת ערך משולש",
+      steps: `א. 35% מ-120:
+┌──────┬────────┬────────┐
+│      │ אחוזים │ מספר   │
+├──────┼────────┼────────┤
+│ חלק  │   35   │   ?    │
+├──────┼────────┼────────┤
+│ שלם  │  100   │  120   │
+└──────┴────────┴────────┘
+? = 35 × 120 ÷ 100 = 42 תלמידים
+
+ב. 24 מתוך 120:
+? = 24 × 100 ÷ 120 = 20%
+
+ג. לא הולכים ברגל = 120 − 42 = 78
+18 מתוך 78:
+? = 18 × 100 ÷ 78 = 23.1% (≈ 23%)`
+    }]
+  },
+
+  // שאלה 2: סדר פעולות 1
+  "0_2": {
+    answer: "✅ 1→7  |  2→7  |  3→1.75  |  4a=0.09, 4b=0.1 — 4b גדול יותר",
+    ways: [{
+      label: "פתרון",
+      steps: `<div style='text-align:left;direction:ltr;line-height:2.2'>
+1 - 2 + 4 × 2 =<br>
+1 - 2 + 8 =<br>
+<b>7</b><br><br>
+(3 + 4) × (2 - 1) =<br>
+7 × 1 =<br>
+<b>7</b><br><br>
+3 × 1/2 + 3/4 ÷ 3 =<br>
+1.5 + 0.25 =<br>
+<b>1.75</b><br><br>
+0.3 × 0.3 = <b>0.09</b><br>
+0.3 ÷ 3 = <b>0.1</b><br>
+0.1 > 0.09 → 4b גדול יותר
+</div>`
+    }]
+  },
+
+  // שאלה 3: סדר פעולות 2
+  "0_3": {
+    answer: "✅ 1→10  |  2→13  |  3→8  |  4a=24, 4b=4 — 4a גדול יותר",
+    ways: [{
+      label: "פתרון",
+      steps: `<div style='text-align:left;direction:ltr;line-height:2.2'>
+20 - 3 × 4 + 2 =<br>
+20 - 12 + 2 =<br>
+<b>10</b><br><br>
+(5 + 3) × 2 - 6 ÷ 2 =<br>
+8 × 2 - 3 =<br>
+16 - 3 =<br>
+<b>13</b><br><br>
+2/3 × 9 + 1/2 × 4 =<br>
+6 + 2 =<br>
+<b>8</b><br><br>
+(10 - 2) × 3 = 8 × 3 = <b>24</b><br>
+10 - 2 × 3 = 10 - 6 = <b>4</b><br>
+24 > 4 → 4a גדול יותר
+</div>`
+    }]
+  },
+
+  // שאלה 4: שאלה מילולית — בנות
+  "0_4": {
+    answer: "✅ 7 בנות",
+    ways: [
+      {
+        label: "טבלת ערך משולש — שני שלבים",
+        steps: `שלב 1: 40% מ-30 = כמה בנות?
+┌──────┬────────┬────────┐
+│      │ אחוזים │ מספר   │
+├──────┼────────┼────────┤
+│ חלק  │   40   │   ?    │
+├──────┼────────┼────────┤
+│ שלם  │  100   │   30   │
+└──────┴────────┴────────┘
+? = 40 × 30 ÷ 100 = 12 בנות
+
+שלב 2: 3/5 = 60%, מ-12:
+┌──────┬────────┬────────┐
+│      │ אחוזים │ מספר   │
+├──────┼────────┼────────┤
+│ חלק  │   60   │   ?    │
+├──────┼────────┼────────┤
+│ שלם  │  100   │   12   │
+└──────┴────────┴────────┘
+? = 60 × 12 ÷ 100 = 7.2 ≈ 7 בנות`
+      }
+    ]
+  },
+
+  // שאלה 5: שאלה מילולית 2 — ספרים
+  "0_5": {
+    answer: "✅ א. 280  |  ב. 238  |  ג. 4.8% פחות מינואר",
+    ways: [{
+      label: "טבלת ערך משולש",
+      steps: `א. 112% מ-250:
+? = 112 × 250 ÷ 100 = 280 ספרים
+
+ב. 85% מ-280 (פברואר × 85%):
+? = 85 × 280 ÷ 100 = 238 ספרים
+
+ג. 238 מתוך 250:
+? = 238 × 100 ÷ 250 = 95.2%
+→ ירידה של 4.8% ביחס לינואר`
+    }]
+  },
+
+  // שאלה 6: אתגר — הנחה כפולה
+  "0_6": {
+    answer: "✅ אפשרות ב זולה יותר: א=289 ש\"ח, ב=280 ש\"ח",
+    ways: [{
+      label: "שתי טבלאות ערך משולש",
+      steps: `אפשרות א — הנחה 15%, ואז עוד 15%:
+טבלה 1: 85×400÷100 = 340 ש"ח
+טבלה 2: 85×340÷100 = 289 ש"ח
+
+אפשרות ב — הנחה 30% ישירות:
+70×400÷100 = 280 ש"ח
+
+📌 אפשרות ב זולה יותר ב-9 ש"ח!
+💡 שתי הנחות של 15% ≠ הנחה של 30%`
+    }]
+  },
+
+  // שאלה 7: בונוס — מחיר לפני הנחה
+  "0_7": {
+    answer: "✅ המחיר המקורי היה 200 ש\"ח",
+    ways: [{
+      label: "טבלת ערך משולש — הפוך",
+      steps: `אחרי הנחה של 15% נשאר 85% מהמחיר.
+170 ש"ח הם 85% מהמחיר המקורי.
+
+┌──────┬────────┬────────┐
+│      │ אחוזים │ מספר   │
+├──────┼────────┼────────┤
+│ חלק  │   85   │  170   │
+├──────┼────────┼────────┤
+│ שלם  │  100   │   ?    │
+└──────┴────────┴────────┘
+? = 170 × 100 ÷ 85 = 200 ש"ח
+
+בדיקה: 200 × 85 ÷ 100 = 170 ✓`
+    }]
+  },
+
+  // ═══ יום 2 ═══
+  // שאלה 0: שטחים 1
+  "1_0": {
+    answer: "✅ א. 84/38  |  ב. 81  |  ג. 84  |  ד. פי 9",
+    ways: [{
+      label: "פתרון מלא",
+      steps: `א. שטח = 12×7 = 84 ס"מ²  |  היקף = 2×(12+7) = 38 ס"מ
+
+ב. צלע = 36÷4 = 9 ס"מ
+   שטח = 9×9 = 81 ס"מ²
+
+ג. סכום 2 צלעות שונות = 40÷2 = 20
+   צלע שנייה = 20−6 = 14 ס"מ
+   שטח = 6×14 = 84 ס"מ²
+
+ד. צלע 5 → שטח 25  |  צלע 15 → שטח 225
+   225÷25 = 9 → גדל פי 9 (כי 3²=9)`
+    }]
+  },
+
+  // שאלה 1: שטחים 2 — אריחים, גדר, מלבן
+  "1_1": {
+    answer: "✅ א. 96 אריחים  |  ב. 2,880 ש\"ח  |  ג. אורך=12, רוחב=8",
+    ways: [{
+      label: "פתרון מלא",
+      steps: `א. שטח חדר = 6×4 = 24 מ"ר = 240,000 ס"מ²
+   שטח אריח = 50×50 = 2,500 ס"מ²
+   מספר אריחים = 240,000÷2,500 = 96
+
+ב. היקף גינה = 2×(20+12) = 64 מ׳
+   עלות = 64 × 45 = 2,880 ש"ח
+
+ג. נסי רוחב=8: אורך=8+4=12
+   שטח = 8×12 = 96 ✓`
+    }]
+  },
+
+  // שאלה 2: סדרות 1
+  "1_2": {
+    answer: "✅ א. 14,17 (+3)  |  ב. 48,96 (×2)  |  ג. 36,49 (ריבועים)  |  ד. 21,34 (פיבונאצ'י)  |  בונוס: 29",
+    ways: [{
+      label: "פתרון",
+      steps: `א. +3: 2,5,8,11,14,17 | איבר 10 = 2+9×3 = 29
+ב. ×2: 3,6,12,24,48,96
+ג. מספרים בריבוע: 1,4,9,16,25,36,49
+ד. כל איבר = שניים שלפניו: 2,3,5,8,13,21,34`
+    }]
+  },
+
+  // שאלה 3: סדרות 2 — איבר ה-n
+  "1_3": {
+    answer: "✅ א. 80,75, איבר10=55  |  ב. 32,64, איבר10=512  |  ג. 23,27, איבר10=39  |  ד. 100",
+    ways: [{
+      label: "פתרון",
+      steps: `א. 100,95,90... (-5 כל פעם)
+   איברים הבאים: 80, 75
+   איבר 10 = 100 + 9×(-5) = 100-45 = 55
+
+ב. 1,2,4,8,16... (×2 כל פעם)
+   איברים הבאים: 32, 64
+   איבר 10 = 2⁹ = 512
+
+ג. 3,7,11,15,19... (+4 כל פעם)
+   איברים הבאים: 23, 27
+   איבר 10 = 3 + 9×4 = 39
+
+ד. כפולות של 5: 5,10,15,20...
+   איבר 20 = 5×20 = 100`
+    }]
+  },
+
+  // שאלה 4: שאלה מילולית — גינה
+  "1_4": {
+    answer: "✅ 105 מ\"ר",
+    ways: [
+      { label: "דרך א", steps: `שטח גינה = 15×8 = 120 מ"ר\nשטח שביל = 15×1 = 15 מ"ר\nדשא = 120−15 = 105 מ"ר` },
+      { label: "דרך ב", steps: `שביל חוצה לשניים. רוחב כל חלק = (8−1)÷2 = 3.5 מ׳\n2 × (15×3.5) = 105 מ"ר` }
+    ]
+  },
+
+  // שאלה 5: אתגר — בריכה + שטח שביל
+  "1_5": {
+    answer: "✅ אורך האולם = 38 מ׳  |  שטח שביל = 384 מ\"ר",
+    ways: [{
+      label: "פתרון שלב אחרי שלב",
+      steps: `רוחב בריכה = 18−4−4 = 10 מ׳
+אורך בריכה = 300÷10 = 30 מ׳
+אורך אולם = 30+4+4 = 38 מ׳
+
+שטח אולם = 38×18 = 684 מ"ר
+שטח שביל = 684−300 = 384 מ"ר`
+    }]
+  },
+
+  // שאלה 6: בונוס — סדרת אריחים ריצוף
+  "1_6": {
+    answer: "✅ אורך=6, רוחב=3  |  ריצוף: 18 אריחים  |  3 שורות",
+    ways: [{
+      label: "פתרון בניסוי מסודר",
+      steps: `נחפש מלבן שאורכו גדול מרוחבו ב-3, והיקפו 18 ס"מ.
+היקף = 2×(אורך+רוחב) = 18 → אורך+רוחב = 9
+אורך = רוחב + 3 → שניהם = 9 → רוחב=3, אורך=6
+
+שטח = 6×3 = 18 ס"מ²
+מספר אריחים = 18 (כל אריח 1×1 ס"מ)
+שורות אריחים = 3 (לפי הרוחב)`
+    }]
+  },
+
+  // ═══ יום 3 ═══
+  // שאלה 0: לוגיקה — מדפים
+  "2_0": {
+    answer: "✅ מדף ב=24, מדף א=48, מדף ג=36",
+    ways: [
+      { label: "ניסוי מסודר", steps: `נסי ב=20: 20+40+28=88 (חסר 20)\nנסי ב=24: 24+48+36=108 ✓` },
+      { label: "הגיון צעד אחר צעד", steps: `ב=X, א=2X, ג=2X−12\nסכום = X+2X+2X−12 = 5X−12 = 108\n5X = 120 → X=24\nב=24, א=48, ג=36` }
+    ]
+  },
+
+  // שאלה 1: לוגיקה 2 — כסף
+  "2_1": {
+    answer: "✅ יוסי=34, דנה=102, מיכל=44  |  דנה: 56.7%",
+    ways: [{
+      label: "ניסוי מסודר",
+      steps: `נסי יוסי=30: 30+90+40=160 (חסר 20)
+נסי יוסי=34: 34+102+44=180 ✓
+
+בדיקה:
+• דנה (102) = פי 3 מיוסי (34) ✓
+• מיכל (44) = יוסי+10 ✓
+• סכום: 34+102+44 = 180 ✓
+
+אחוז דנה: 102×100÷180 = 56.7%`
+    }]
+  },
+
+  // שאלה 2: ניתוח מידע — טיול
+  "2_2": {
+    answer: "✅ א. 25%  |  ב. 24 ק\"מ  |  ג. 9.6 ק\"מ",
+    ways: [{
+      label: "טבלת ערך משולש",
+      steps: `א. 2/5=40%, סה"כ: 40+35=75%, נשאר: 25%
+
+ב. 6 ק"מ = 25% מהמסלול:
+┌──────┬────────┬──────┐
+│      │ אחוזים │ ק"מ  │
+├──────┼────────┼──────┤
+│ חלק  │   25   │  6   │
+├──────┼────────┼──────┤
+│ שלם  │  100   │  ?   │
+└──────┴────────┴──────┘
+? = 6×100÷25 = 24 ק"מ
+
+ג. 40% מ-24:
+? = 40×24÷100 = 9.6 ק"מ`
+    }]
+  },
+
+  // שאלה 3: ניתוח מידע 2 — ספרייה
+  "2_3": {
+    answer: "✅ א. 80  |  ב. 48  |  ג. 72",
+    ways: [{
+      label: "פתרון שלב אחרי שלב",
+      steps: `א. עברית = 40% מ-200:
+? = 40×200÷100 = 80 ספרים
+
+ב. אנגלית + מתמטיקה = 200−80 = 120
+   אנגלית = מתמטיקה × 1.5
+   נסי מתמטיקה=48: אנגלית=72, סכום=120 ✓
+
+ג. אנגלית = 72 ספרים`
+    }]
+  },
+
+  // שאלה 4: בעיה מורכבת — חנייה
+  "2_4": {
+    answer: "✅ א. 14 ש\"ח  |  ב. 7 שעות  |  ג. 3.50 ש\"ח",
+    ways: [{
+      label: "פתרון",
+      steps: `א. 5 + 3×3 = 5+9 = 14 ש"ח
+
+ב. 23−5 = 18 ש"ח נשאר
+   18÷3 = 6 שעות נוספות
+   1+6 = 7 שעות
+
+ג. 14÷4 = 3.50 ש"ח לשעה`
+    }]
+  },
+
+  // שאלה 5: כדורים ומאזניים
+  "2_5": {
+    answer: "✅ 2 שקילות",
+    ways: [{
+      label: "האסטרטגיה המלאה",
+      steps: `שקילה 1: 3 מול 3 (2 בצד).
+
+מקרה א — צד אחד כבד:
+  שקילה 2: 1 מול 1 מהצד הכבד (1 בצד).
+  כבד → מצאנו! | שווה → זה שבצד.
+
+מקרה ב — שווה:
+  שקילה 2: 1 מול 1 מהשניים שבצד.
+  הכבד → מצאנו!
+
+✅ 2 שקילות מספיקות תמיד.`
+    }]
+  },
+
+  // שאלה 6: אתגר — כדורגל + כדורסל
+  "2_6": {
+    answer: "✅ א. 12  |  ב. 18  |  ג. 10",
+    ways: [{
+      label: "פתרון שלב אחרי שלב",
+      steps: `אוהבי כדורגל = 32÷2 = 16
+אוהבי שניהם = 3/4 × 16 = 12
+אוהבי כדורסל בלבד = 6 (נתון)
+אוהבי כדורסל כולל = 12+6 = 18
+
+לא אוהבים אף אחד:
+אוהבים כדורגל בלבד = 16−12 = 4
+אוהבים לפחות אחד = 4+12+6 = 22
+לא אוהבים שניהם = 32−22 = 10`
+    }]
+  },
+
+  // שאלה 7: בונוס — פרסות בכיתה
+  "2_7": {
+    answer: "✅ א. 10  |  ב. 12  |  ג. 14  |  ד. 26",
+    ways: [{
+      label: "פתרון שלב אחרי שלב",
+      steps: `א. ספר = 25% מ-40 = 10 תלמידים
+ב. ציון = 30% מ-40 = 12 תלמידים
+ג. שניהם = 8 (נתון)
+
+לפחות פרס אחד:
+ספר בלבד = 10−8 = 2
+ציון בלבד = 12−8 = 4
+שניהם = 8
+סה"כ = 2+4+8 = 14
+
+ד. לא קיבלו שום פרס = 40−14 = 26`
+    }]
+  },
+
+  // ═══ יום 4 ═══
+  // שאלה 0: חזרה אחוזים
+  "3_0": {
+    answer: "✅ א. 70  |  ב. 25%  |  ג. 300",
+    ways: [{
+      label: "טבלת ערך משולש",
+      steps: `א. 35×200÷100 = 70
+ב. 60×100÷240 = 25%
+ג. 45×100÷15 = 300`
+    }]
+  },
+
+  // שאלה 1: חזרה שטחים
+  "3_1": {
+    answer: "✅ א. 117  |  ב. 162  |  ג. 56",
+    ways: [{
+      label: "פתרון",
+      steps: `א. 13×9 = 117 ס"מ²
+
+ב. רוחב=X, אורך=2X, היקף=6X=54 → X=9
+   שטח = 9×18 = 162 ס"מ²
+
+ג. אולם: (6+4)×(4+4) = 80 מ"ר
+   בריכה: 6×4 = 24 מ"ר
+   מדרכה = 80−24 = 56 מ"ר`
+    }]
+  },
+
+  // שאלה 2: חזרה סדרות
+  "3_2": {
+    answer: "✅ א. 27,32 / איבר15=77  |  ב. 32,64 / איבר8=128  |  ג. 64,1 — הסדרה יורדת!",
+    ways: [{
+      label: "פתרון",
+      steps: `א. +5 כל פעם: 7,12,17,22,27,32
+   איבר 15 = 7 + 14×5 = 77
+
+ב. ×2 כל פעם: 1,2,4,8,16,32,64
+   איבר 8 = 2⁷ = 128
+
+ג. −9 כל פעם: 100,91,82,73,64,55...
+   "מילה ה-12" = 100 + 11×(-9) = 1`
+    }]
+  },
+
+  // שאלה 3: חשיבה צורנית
+  "3_3": {
+    answer: "✅ א. □□□□  |  ב. 15  |  ג. 8  |  ד. ■■■■ / ■",
+    ways: [{
+      label: "פתרון",
+      steps: `א. איבר 8 = זוגי → ריבועים, כמות = 4 → □□□□
+
+ב. משולשים באיברים 1,3,5,7,9:
+   1+2+3+4+5 = 15 משולשים
+
+ג. גוף 2×2×2: אין קוביה פנימית.
+   כל 8 הקוביות נראות מבחוץ.
+
+ד. מלמעלה: ■■■■ | מהצד: ■`
+    }]
+  },
+
+  // שאלה 4: חשיבה צורנית 2 — שורות קוביות
+  "3_4": {
+    answer: "✅ א. 11  |  ב. 25  |  ג. קוביות בשורה n = 2n−1",
+    ways: [{
+      label: "פתרון",
+      steps: `כלל: שורה n מכילה 2n−1 קוביות.
+שורה 1: 1 | שורה 2: 3 | שורה 3: 5...
+
+א. שורה 6: 2×6−1 = 11 קוביות
+
+ב. סכום 5 שורות: 1+3+5+7+9 = 25 קוביות
+   (זה תמיד n²! כאן 5²=25)
+
+ג. שורה n = 2n−1`
+    }]
+  },
+
+  // שאלה 5: שאלת סיכום — תיקים
+  "3_5": {
+    answer: "✅ א. 12,000  |  ב. 64  |  ג. 10,560  |  ד. ינואר ב-1,440",
+    ways: [{
+      label: "טבלת ערך משולש",
+      steps: `א. 80×150 = 12,000 ש"ח
+
+ב. 80% מ-80 תיקים:
+? = 80×80÷100 = 64 תיקים
+
+ג. 110% מ-150:
+? = 110×150÷100 = 165 ש"ח לתיק
+   הכנסה = 64×165 = 10,560 ש"ח
+
+ד. 12,000−10,560 = 1,440 ש"ח
+   ינואר גבוה יותר!`
+    }]
+  },
+
+  // שאלה 6: אתגר — סיור עם אחוזים
+  "3_6": {
+    answer: "✅ א. 110  |  ב. 11  |  ג. 99",
+    ways: [{
+      label: "טבלת ערך משולש",
+      steps: `שלב 1: יום ראשון — 15% נשרו, נשאר 85%:
+? = 85×120÷100 = 102
+
+שלב 2: יום שני = 102+8 = 110 תלמידים
+
+שלב 3: 10% מ-110 עזבו:
+? = 10×110÷100 = 11
+
+שלב 4: יום שלישי = 110−11 = 99 תלמידים`
+    }]
+  },
+
+  // שאלה 7: בונוס — ריבוע מחולק
+  "3_7": {
+    answer: "✅ א. 2.5 ס\"מ  |  ב. 16 ריבועים  |  ג. 6.25 ס\"מ²  |  ד. ביחס 1:4",
+    ways: [{
+      label: "פתרון שלב אחרי שלב",
+      steps: `חלוקה ראשונה: 4 ריבועים עם צלע 5 ס"מ
+חלוקה שנייה: 16 ריבועים עם צלע 2.5 ס"מ
+
+א. צלע קטנה = 2.5 ס"מ
+ב. מספר ריבועים = 16
+ג. שטח קטן = 2.5×2.5 = 6.25 ס"מ²
+
+ד. היקף גדול = 4×10 = 40 ס"מ
+   סכום היקפי קטנים = 16×(4×2.5) = 16×10 = 160 ס"מ
+   יחס = 40:160 = 1:4`
+    }]
+  }
+};
+// ── DAY DATA ────────────────────────────────────────────────────
+const days = [
+  {
+    label: "יום 1",
+    title: "אחוזים + סדר פעולות",
+    meta: "שבת 31.5 · 60 דקות",
+    topics: ["אחוזים", "הנחות כפולות", "סדר פעולות", "שברים"],
+    tip: "💡 טיפ להיום: כשיש שתי הנחות בזו אחר זו — כל הנחה מחושבת על המחיר שנשאר אחרי ההנחה הקודמת, לא על המחיר המקורי!",
+    exercises: [
+      {
+        type: "תרגול אחוזים", time: "8 דק׳",
+        question: "בחנות נעליים:\n\nא. זוג נעליים עולה 240 ש\"ח. יש הנחה של 20%. מה המחיר החדש?\n\nב. יום למחרת מוסיפים מבצע: עוד 10% הנחה על המחיר שנשאר מסעיף א. מה המחיר הסופי שמשלמים?\n\nג. בסך הכל — כמה אחוז ירד המחיר מ-240 ש\"ח המקוריים?\n(שימי לב: התשובה היא לא 30%!)",
+        hint: "בשאלה ג — חשבי כמה שילמת בסוף, ואז: כמה חסכת? חסכון ÷ 240 × 100.",
+        method: "percent_basic",
+        answer_key: "192 172.80 28"
+      },
+      {
+        type: "תרגול אחוזים 2", time: "8 דק׳",
+        question: "בכיתה יש 120 תלמידים.\n\nא. 35% מהתלמידים הולכים ברגל לבית הספר. כמה תלמידים הולכים ברגל?\n\nב. 24 תלמידים נוסעים באוטובוס. כמה אחוז מהכיתה זה?\n\nג. 18 תלמידים רוכבים על אופניים. הם כמה אחוז מהתלמידים שלא הולכים ברגל?\n(רמז: קודם מצאי כמה לא הולכים ברגל)",
+        hint: "שאלה ג: כמה לא הולכים ברגל? 120 - (35% מ-120). ואז 18 ÷ מספר זה × 100.",
+        method: "percent_basic",
+        answer_key: "42 20 22.5"
+      },
+      {
+        type: "סדר פעולות", time: "8 דק׳",
+        question: "חשבי את התוצאה של כל תרגיל. הראי את כל השלבים — כל שלב בשורה חדשה!\n\n<div style='text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd'>1.&nbsp;&nbsp;1 - 2 + 4 × 2 =<br>2.&nbsp;&nbsp;(3 + 4) × (2 - 1) =<br>3.&nbsp;&nbsp;3 × 1/2 + 3/4 ÷ 3 =</div>\n\nמה גדול יותר? הסבירי:\n<div style='text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd'>4a.&nbsp;&nbsp;0.3 × 0.3 =<br>4b.&nbsp;&nbsp;0.3 ÷ 3 =</div>",
+        hint: "סדר פעולות: קודם סוגריים, אחר כך כפל וחילוק, ורק בסוף חיבור וחיסור.",
+        method: "order_of_ops",
+        answer_key: "7 7 1.75 0.09 0.1"
+      },
+      {
+        type: "סדר פעולות 2", time: "8 דק׳",
+        question: "חשבי. כל שלב בשורה חדשה!\n\n<div style='text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd'>1.&nbsp;&nbsp;20 - 3 × 4 + 2 =<br>2.&nbsp;&nbsp;(5 + 3) × 2 - 6 ÷ 2 =<br>3.&nbsp;&nbsp;2/3 × 9 + 1/2 × 4 =</div>\n\nבלי לחשב — איזה מהם גדול יותר? ולמה?\n<div style='text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd'>4a.&nbsp;&nbsp;(10 - 2) × 3 =<br>4b.&nbsp;&nbsp;10 - 2 × 3 =</div>",
+        hint: "בתרגיל 4 — שימי לב איפה יש סוגריים ואיפה אין.",
+        method: "order_of_ops",
+        answer_key: "10 13 8 24 4"
+      },
+      {
+        type: "שאלה מילולית", time: "8 דק׳",
+        question: "בכיתה ו׳ יש 30 תלמידים.\n40% מהתלמידים הם בנות.\nמכלל הבנות — לשלושה חמישיות (3/5) מהן יש אחות קטנה.\n\nשאלה: כמה בנות בכיתה יש להן אחות קטנה?",
+        hint: "שלב 1: 40% מ-30 = כמה בנות? שלב 2: 3/5 מהבנות = כמה בנות עם אחות?",
+        method: "word_problem",
+        answer_key: "7"
+      },
+      {
+        type: "שאלה מילולית 2", time: "8 דק׳",
+        question: "בחנות ספרים מכרו בחודש ינואר 250 ספרים.\nבפברואר מכרו 12% יותר מינואר.\nבמרץ מכרו 15% פחות מפברואר.\n\nא. כמה ספרים מכרו בפברואר?\nב. כמה ספרים מכרו במרץ?\nג. האם מכרו במרץ יותר או פחות מינואר, ובכמה אחוזים?",
+        hint: "עבדי שלב אחרי שלב. פברואר = 250 × 112/100. מרץ = תשובת פברואר × 85/100.",
+        method: "percent_basic",
+        answer_key: "280 238 4.8"
+      },
+      {
+        type: "🎯 שאלת אתגר", time: "8 דק׳",
+        question: "מחיר חליפה הוא 400 ש\"ח.\n\nבחנות מציעים שתי אפשרויות:\n📌 אפשרות א — הנחה של 15%, ואחר כך הנחה נוספת של 15% על המחיר שנשאר.\n📌 אפשרות ב — הנחה אחת של 30% ישירות על המחיר המקורי.\n\nאיזו אפשרות זולה יותר לקונה?\nחשבי את שתי האפשרויות בנפרד והסבירי את תשובתך!",
+        hint: "באפשרות א: קודם חשבי 15% הנחה על 400. קבלת מחיר חדש. עכשיו חשבי 15% הנחה על המחיר החדש הזה (לא על 400!).",
+        method: "percent_double",
+        answer_key: "289 280"
+      },
+      {
+        type: "⭐ בונוס", time: "6 דק׳",
+        question: "דני קנה מוצר ושילם עליו 170 ש\"ח אחרי הנחה של 15%.\n\nמה היה המחיר המקורי של המוצר לפני ההנחה?\n\n(רמז: הפעם אתה יודעת את המחיר אחרי ההנחה, לא לפניה!)",
+        hint: "אחרי הנחה של 15% נשאר 85% מהמחיר. אז 170 = 85% מהמחיר המקורי. בטבלה: 170 בשורת החלק, 85 באחוזים — מה השלם?",
+        method: "percent_basic",
+        answer_key: "200"
+      }
+    ]
+  },
+  {
+    label: "יום 2",
+    title: "שטחים והיקפים + סדרות",
+    meta: "ראשון 1.6 · 60 דקות",
+    topics: ["שטח מלבן", "היקף", "בעיית הבריכה", "חוקיות"],
+    tip: "💡 טיפ להיום: בכל שאלה של צורה בתוך צורה — שרטטי ציור ורשמי את המספרים על כל צלע. זה חוסך המון בלבול!",
+    exercises: [
+      {
+        type: "תרגול שטחים", time: "10 דק׳",
+        question: "א. מלבן שאורכו 12 ס\"מ ורוחבו 7 ס\"מ.\n   חשבי: שטח + היקף.\n\nב. ריבוע שהיקפו הוא 36 ס\"מ.\n   מה הוא שטחו?\n   (רמז: קודם מצאי את אורך הצלע)\n\nג. מלבן שהיקפו הוא 40 ס\"מ, ואורכה של צלע אחת הוא 6 ס\"מ.\n   מה הוא שטחו?\n\nד. ריבוע עם צלע באורך 5 ס\"מ. מה קורה לשטח אם מכפילים את אורך הצלע פי 3?\n   חשבי את שני השטחים והשווי.",
+        hint: "שאלה ד — קודם חשבי שטח ריבוע עם צלע 5. אחר כך חשבי שטח ריבוע עם צלע 15. בכמה גדל?",
+        method: "area_perimeter",
+        answer_key: "84 38 81 84 9"
+      },
+      {
+        type: "תרגול שטחים 2", time: "8 דק׳",
+        question: "א. ריצפת חדר מלבני שאורכו 6 מ׳ ורוחבו 4 מ׳. כל אריח הוא ריבוע בגודל 50×50 ס\"מ.\n   כמה אריחים נדרשים?\n\nב. גדר סביב גינה מלבנית 20×12 מ׳ עולה 45 ש\"ח למטר.\n   מה עולה הגדר כולה?\n\nג. מלבן שאורכו גדול מרוחבו ב-4 ס\"מ, ושטחו 96 ס\"מ².\n   מצאי את אורכו ורוחבו.",
+        hint: "שאלה א: המירי לאותה יחידה — כמה אריחים בשורה? כמה שורות?\nשאלה ג: נסי רוחב=8, אורך=12. האם 8×12=96?",
+        method: "area_perimeter",
+        answer_key: "96 2880 12 8"
+      },
+      {
+        type: "חוקיות בסדרות", time: "8 דק׳",
+        question: "בכל סדרה — מצאי מה הכלל והמשיכי אותה:\n\nא. 2, 5, 8, 11, ___, ___\n   הכלל: ___\n\nב. 3, 6, 12, 24, ___, ___\n   הכלל: ___\n\nג. 1, 4, 9, 16, 25, ___, ___\n   הכלל: ___\n\nד. 2, 3, 5, 8, 13, ___, ___\n   הכלל: ___\n\n⭐ בונוס: מהו האיבר ה-10 בסדרה א׳?",
+        hint: "סדרה ד — כל איבר הוא סכום שני האיברים שלפניו. 2+3=5, 3+5=8...",
+        method: "sequences",
+        answer_key: "14 17 48 96 36 49 21 34 29"
+      },
+      {
+        type: "חוקיות בסדרות 2", time: "8 דק׳",
+        question: "מצאי את החוקיות, המשיכי, ומצאי את האיבר ה-10:\n\nא. 100, 95, 90, 85, ___, ___\n   איבר 10 = ___\n\nב. 1, 2, 4, 8, 16, ___, ___\n   איבר 10 = ___\n\nג. 3, 7, 11, 15, 19, ___, ___\n   איבר 10 = ___\n\nד. מה האיבר ה-20 בסדרה: 5, 10, 15, 20...?",
+        hint: "לסדרה חשבונית: איבר n = איבר ראשון + (n-1) × הפרש. לסדרה ד: זה כפולות של 5.",
+        method: "sequences",
+        answer_key: "80 75 55 512 39 100"
+      },
+      {
+        type: "שאלה מילולית", time: "8 דק׳",
+        question: "גינה מלבנית שאורכה 15 מטר ורוחבה 8 מטר.\nבאמצע הגינה — לאורך כולה — עובר שביל אבנים ברוחב 1 מטר.\nשאר הגינה מכוסה דשא.\n\n❓ מה שטח הדשא?",
+        hint: "שטח הדשא = שטח הגינה כולה פחות שטח השביל.",
+        method: "area_perimeter",
+        answer_key: "105"
+      },
+      {
+        type: "🎯 שאלת אתגר", time: "10 דק׳",
+        question: "בריכת שחייה בנויה בתוך אולם מלבני.\nהבריכה עצמה היא גם מלבן, ושטחה הוא 300 מ\"ר.\n\nסביב הבריכה יש שביל הליכה — ברוחב קבוע של 4 מטרים מכל הצדדים.\nרוחב האולם כולו (כולל הבריכה והשביל) הוא 18 מטר.\n\n❓ מהו אורך האולם?\n❓ מהו שטח השביל?\n\nטיפ: שרטטי ציור!",
+        hint: "רוחב הבריכה = 18 − 4 − 4 = 10 מ׳. שטח ÷ רוחב = אורך הבריכה. אורך אולם = אורך בריכה + 8. שטח שביל = שטח אולם − שטח בריכה.",
+        method: "area_perimeter",
+        answer_key: "38 384"
+      },
+      {
+        type: "⭐ בונוס", time: "8 דק׳",
+        question: "אדם רצה לרצף מרפסת מלבנית באריחים ריבועיים של 1×1 מטר.\nהוא מדד ומצא שהאורך גדול מהרוחב ב-3 מטרים, וההיקף הוא 18 מטר.\n\nא. מה אורך המרפסת ומה רוחבה?\n   (רמז: אם אורך+רוחב = חצי ההיקף, ואורך = רוחב+3 — נסי כמה ערכים)\n\nב. כמה אריחים נדרשים לריצוף?\n\nג. כמה שורות של אריחים יהיו לאורך, וכמה לרוחב?",
+        hint: "אורך + רוחב = 18÷2 = 9. נסי: רוחב=3, אורך=6. האם 3+6=9? האם אורך-רוחב=3?",
+        method: "area_perimeter",
+        answer_key: "6 3 18"
+      }
+    ]
+  },
+  {
+    label: "יום 3",
+    title: "לוגיקה + בעיות מורכבות",
+    meta: "שני 2.6 · 60 דקות",
+    topics: ["ניתוח מידע", "הסקת מסקנות", "חשיבה מחוץ לקופסא"],
+    tip: "💡 טיפ להיום: בשאלות לוגיקה — קראי שוב לאט לפני שמתחילים לחשב. כל מילה בשאלה חשובה!",
+    exercises: [
+      {
+        type: "שאלת לוגיקה", time: "10 דק׳",
+        question: "בחנות ספרים יש שלושה מדפים: מדף א, מדף ב, מדף ג.\n\nנתון:\n• על מדף א יש פי 2 ספרים מאשר על מדף ב.\n• על מדף ג יש 12 ספרים פחות מאשר על מדף א.\n• סך כל הספרים בשלושת המדפים: 108.\n\n❓ כמה ספרים יש על כל מדף?",
+        hint: "נסמן מדף ב = X. אז מדף א = 2X, מדף ג = 2X−12. חברי: X + 2X + (2X−12) = 108.",
+        method: "logic",
+        answer_key: "24 48 36"
+      },
+      {
+        type: "שאלת לוגיקה 2", time: "10 דק׳",
+        question: "לדנה, יוסי ומיכל יש ביחד 180 ש\"ח.\nלדנה יש פי 3 יותר מאשר ליוסי.\nלמיכל יש 10 ש\"ח יותר מיוסי.\n\nא. כמה כסף יש לכל אחד?\nב. כמה אחוז מהסכום הכולל יש לדנה?",
+        hint: "נסמן יוסי = X. דנה = 3X, מיכל = X+10. חברי: X + 3X + (X+10) = 180.",
+        method: "logic",
+        answer_key: "34 102 44 56.7"
+      },
+      {
+        type: "ניתוח מידע", time: "8 דק׳",
+        question: "קבוצת טיולים הלכה מסלול בן 3 ימים:\n• ביום הראשון הלכו 2/5 מאורך המסלול הכולל.\n• ביום השני הלכו 35% מאורך המסלול הכולל.\n• ביום השלישי הלכו את מה שנשאר.\n\nא. כמה אחוזים מהמסלול הלכו ביום השלישי?\nב. ביום השלישי הלכו 6 ק\"מ. מה אורך המסלול?\nג. כמה ק\"מ הלכו ביום הראשון?",
+        hint: "2/5 = 40%. ימים א+ב = 75%. נשאר 25% = 6 ק\"מ → מסלול שלם = ?",
+        method: "percent_basic",
+        answer_key: "25 24 9.6"
+      },
+      {
+        type: "ניתוח מידע 2", time: "8 דק׳",
+        question: "בספרייה יש ספרי עברית, אנגלית ומתמטיקה.\n• 40% מהספרים הם ספרי עברית.\n• ספרי אנגלית הם פי 1.5 מספרי מתמטיקה.\n• סך הכל 200 ספרים.\n\nא. כמה ספרי עברית יש?\nב. כמה ספרי מתמטיקה יש?\nג. כמה ספרי אנגלית יש?",
+        hint: "שלב 1: ספרי עברית = 40% מ-200. שלב 2: מתמטיקה + אנגלית = 120. אנגלית = 1.5 × מתמטיקה. נסמן מתמטיקה = X.",
+        method: "logic",
+        answer_key: "80 48 72"
+      },
+      {
+        type: "בעיה מורכבת", time: "8 דק׳",
+        question: "חנייה בקניון גובה תשלום כך:\n• השעה הראשונה עולה 5 ש\"ח.\n• כל שעה נוספת (מהשנייה ואילך) עולה 3 ש\"ח.\n\nא. כמה משלמים על חנייה של 4 שעות?\nב. דנה יצאה מהחנייה ושילמה 23 ש\"ח. כמה שעות חנתה?\nג. מהו המחיר הממוצע לשעה בחנייה של 4 שעות?",
+        hint: "שאלה ב: ניכי 5 ש\"ח לשעה הראשונה. נשארו 18 ש\"ח ÷ 3 = שעות נוספות.",
+        method: "multistep",
+        answer_key: "14 7 3.5"
+      },
+      {
+        type: "חשיבה מחוץ לקופסא", time: "8 דק׳",
+        question: "יש לפניך 8 כדורים. הם נראים אותו הדבר בדיוק, אבל אחד מהם כבד יותר מהשאר.\n\nיש לך מאזניים פשוטים — מראים רק מי כבד יותר, ללא מספרים.\n\n❓ מה המספר המינימלי של שקילות לאתר את הכדור הכבד בוודאות?\n\nהסבירי את כל הדרך!",
+        hint: "חלקי ל-3 קבוצות: 3 כדורים, 3 כדורים, 2 כדורים. שקילה 1: שימי 3 מול 3.",
+        method: "outside_box",
+        answer_key: "2"
+      },
+      {
+        type: "🎯 שאלת אתגר", time: "10 דק׳",
+        question: "בכיתה יש 32 תלמידים.\n\n• מחציתם אוהבים כדורגל.\n• 3/4 מאוהבי הכדורגל גם אוהבים כדורסל.\n• 6 תלמידים אוהבים כדורסל אבל לא כדורגל.\n\nא. כמה תלמידים אוהבים גם כדורגל וגם כדורסל?\nב. כמה תלמידים אוהבים כדורסל בסך הכל?\nג. כמה תלמידים לא אוהבים אף אחד מהשניים?",
+        hint: "שלב 1: כמה אוהבים כדורגל? שלב 2: 3/4 מהם = אוהבי שניהם. שלב 3: כדורסל כולל = שניהם + רק כדורסל.",
+        method: "logic",
+        answer_key: "12 18 10"
+      },
+      {
+        type: "⭐ בונוס", time: "8 דק׳",
+        question: "בכיתה יש 40 תלמידים. בסוף שנה מוענקות פרסות:\n• 25% מהתלמידים קיבלו פרס ספר.\n• 30% מהתלמידים קיבלו פרס ציור.\n• 8 תלמידים קיבלו את שני הפרסים יחד.\n\nא. כמה תלמידים קיבלו פרס ספר?\nב. כמה תלמידים קיבלו פרס ציון?\nג. כמה תלמידים קיבלו לפחות פרס אחד?\nד. כמה תלמידים לא קיבלו שום פרס?",
+        hint: "א+ב: פשוט אחוזים. ג: ספר + ציון - שניהם (כי ספרנו את 8 התלמידים עם שניהם פעמיים).",
+        method: "logic",
+        answer_key: "10 12 14 26"
+      }
+    ]
+  },
+  {
+    label: "יום 4",
+    title: "חזרה + חשיבה צורנית",
+    meta: "שלישי 3.6 · 60 דקות",
+    topics: ["חשיבה מרחבית", "דפוסים חזותיים", "חזרה מהירה"],
+    tip: "💡 מחר המבחן! תרגול קצר ורגוע היום — ואז לישון טוב. כל ההכנה כבר בראש! ⭐",
+    exercises: [
+      {
+        type: "חזרה מהירה — אחוזים", time: "8 דק׳",
+        question: "שלוש שאלות, שלושה סוגים שונים של אחוזים:\n\nא. מה הם 35% מ-200?\n\nב. 60 הם כמה אחוז מתוך 240?\n\nג. 45 הוא 15% ממספר מסוים. מה המספר?",
+        hint: "כל שאלה בודקת סוג אחר: א=חלק מהשלם, ב=מציאת האחוז, ג=מציאת השלם.",
+        method: "percent_basic",
+        answer_key: "70 25 300"
+      },
+      {
+        type: "חזרה מהירה — שטחים", time: "8 דק׳",
+        question: "א. מה שטח מלבן שאורכו 13 ס\"מ ורוחבו 9 ס\"מ?\n\nב. מלבן שאורכו פי 2 מרוחבו, והיקפו הוא 54 ס\"מ.\n   מה שטחו?\n\nג. בריכה מלבנית שאורכה 6 מ׳ ורוחבה 4 מ׳.\n   סביבה יש מדרכה ברוחב 2 מ׳ מכל הצדדים.\n   מה שטח המדרכה?",
+        hint: "שאלה ג: שטח אולם חיצוני (6+4)×(4+4) פחות שטח בריכה.",
+        method: "area_perimeter",
+        answer_key: "117 162 56"
+      },
+      {
+        type: "חזרה מהירה — סדרות", time: "6 דק׳",
+        question: "א. סדרה: 7, 12, 17, 22, ___, ___  →  איבר ה-15 = ?\n\nב. סדרה: 1, 3, 9, 27, ___, ___  →  איבר ה-8 = ?\n\nג. סדרה: 100, 91, 82, 73, ___, ___  →  מהי המילה ה-12?",
+        hint: "א: סדרה חשבונית, הפרש=5. איבר n = 7 + (n-1)×5.\nב: סדרה הנדסית, ×3. איבר n = 3^(n-1).",
+        method: "sequences",
+        answer_key: "27 32 77 2187 64 1"
+      },
+      {
+        type: "חשיבה צורנית", time: "10 דק׳",
+        question: "הסתכלי על הסדרה הבאה:\n▲  □  ▲▲  □□  ▲▲▲  □□□  ...\n\nא. מהו האיבר ה-8?\nב. כמה משולשים בסך הכל עד האיבר ה-10?\nג. גוף 2×2×2 (8 קוביות). כמה קוביות נראות מבחוץ?\nד. צייר מבט מלמעלה ומהצד: 4 קוביות בשורה.",
+        hint: "שאלה ג: בגוף 2×2×2 אין קוביה פנימית כלל.",
+        method: "spatial",
+        answer_key: "4 15 8"
+      },
+      {
+        type: "חשיבה צורנית 2", time: "8 דק׳",
+        question: "בנו גוף מקוביות לפי הכלל:\nשורה 1 (תחתית): 1 קוביה.\nשורה 2: 3 קוביות (שורה של 3).\nשורה 3: 5 קוביות (שורה של 5).\n...\n\nא. כמה קוביות בשורה ה-6?\nב. כמה קוביות בסך הכל בגוף בעל 5 שורות?\nג. מה הקשר בין מספר השורה לכמות הקוביות בה?",
+        hint: "שורה n מכילה (2n−1) קוביות. סכום: 1+3+5+7+9 = ?",
+        method: "spatial",
+        answer_key: "11 25 9"
+      },
+      {
+        type: "שאלת סיכום", time: "10 דק׳",
+        question: "חנות מוכרת תיקים.\n\nבינואר: 80 תיקים × 150 ש\"ח.\nפברואר: מחיר עלה ב-10%, כמות ירדה ב-20%.\n\nא. הכנסה בינואר?\nב. כמה תיקים נמכרו בפברואר?\nג. הכנסה בפברואר?\nד. באיזה חודש הכנסה גבוהה יותר ובכמה?",
+        hint: "מחיר חדש = 150 × 110/100. כמות חדשה = 80 × 80/100.",
+        method: "multistep",
+        answer_key: "12000 64 10560 1440"
+      },
+      {
+        type: "🎯 שאלת אתגר", time: "8 דק׳",
+        question: "בסיור יצאו 120 תלמידים.\n\n• ביום הראשון עזבו 15% בגלל מחלה.\n• ביום השני הצטרפו 8 תלמידים חדשים.\n• ביום השלישי עזבו 10% מהתלמידים שהיו ביום השני.\n\nא. כמה תלמידים היו ביום השני?\nב. כמה עזבו ביום השלישי?\nג. כמה תלמידים סיימו את הסיור?",
+        hint: "יום שני: 120 × 85/100 = ? ואז הוסיפי 8. יום שלישי: 10% מהמספר ביום השני עוזבים.",
+        method: "percent_basic",
+        answer_key: "110 11 99"
+      },
+      {
+        type: "⭐ בונוס", time: "6 דק׳",
+        question: "ריבוע גדול עם צלע 10 ס\"מ.\nחילקו אותו ל-4 ריבועים שווים.\nכל ריבוע קטן חולק שוב ל-4 ריבועים שווים.\n\nא. מה אורך צלע הריבוע הקטן ביותר?\nב. כמה ריבועים קטנים יש בסך הכל?\nג. מה שטח כל ריבוע קטן?\nד. מה ביחס בין היקף הריבוע הגדול לסכום ההיקפים של כל הריבועים הקטנים?",
+        hint: "אחרי חלוקה ראשונה: 4 ריבועים עם צלע 5. אחרי שנייה: 16 ריבועים עם צלע 2.5.",
+        method: "spatial",
+        answer_key: "2.5 16 6.25 4"
+      }
+    ]
+  }
+];
+
+// ── RENDER ──────────────────────────────────────────────────────
+let activeDay = 0;
+
+function renderTabs() {
+  document.getElementById('dayTabs').innerHTML = days.map((d,i) =>
+    `<div class="day-tab ${i===activeDay?'active':''}" onclick="switchDay(${i})">${d.label}</div>`
+  ).join('');
+  const pct = (activeDay / days.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function switchDay(i) {
+  activeDay = i;
+  renderTabs();
+  renderContent();
+}
+
+function toggle(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display==='block'?'none':'block';
+}
+
+function openMethod(key) {
+  const m = methods[key];
+  if (!m) return;
+  document.getElementById('modalTitle').textContent = m.title;
+  document.getElementById('modalBody').innerHTML = m.html;
+  document.getElementById('methodModal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target.id==='methodModal') closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('methodModal').classList.remove('open');
+}
+
+  // ── DAY 5 — MOCK EXAM ───────────────────────────────────────────
+  days.push({
+    label: "יום 5 — מבחן מדומה",
+    title: "מבחן מדומה",
+    meta: "שלישי 3.6 · 40 דקות · ללא רמזים בהתחלה!",
+    topics: ["כל הנושאים", "תנאי מבחן"],
+    tip: "⏱ זה מבחן מדומה! נסי לפתור לבד תחילה — בלי לפתוח רמזים. רק אם ממש תקועה — אז רמז. מחר המבחן האמיתי!",
+    exercises: [
+      {
+        type: "סדר פעולות", time: "5 דק׳",
+        question: "חשבי (הראי שלבים):\n\n<div style='text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd'>12 - 3 × 2 + (8 - 5) =</div>",
+        hint: "קודם סוגריים, אחר כך כפל, אחר כך חיבור וחיסור.",
+        method: "order_of_ops",
+        answer_key: "9"
+      },
+      {
+        type: "אחוזים", time: "7 דק׳",
+        question: "בחנות ספרים ספר עולה 120 ש\"ח.\nבמבצע — הנחה של 25%.\nאחרי ההנחה, המחיר עולה עוד ב-10% בגלל מע\"מ.\n\nמה המחיר הסופי שמשלמים?",
+        hint: "שני שלבים: קודם חשבי מחיר אחרי הנחה, ואז הוסיפי 10% על המחיר החדש.",
+        method: "percent_double",
+        answer_key: "99"
+      },
+      {
+        type: "חוקיות בסדרות", time: "5 דק׳",
+        question: "מצאי את החוקיות וכתבי את שני האיברים הבאים:\n\n5, 8, 13, 20, 29, ___, ___\n\nמהו האיבר ה-10 בסדרה?",
+        hint: "בדקי את ההפרשים בין האיברים: 3, 5, 7, 9... מה הדפוס?",
+        method: "sequences",
+        answer_key: "40, 53"
+      },
+      {
+        type: "שטחים והיקפים", time: "7 דק׳",
+        question: "ריצפת חדר בצורת מלבן — אורך 6 מ׳, רוחב 4 מ׳.\nרוצים לרצף את החדר בקרמיקה.\nכל אריח ריבועי בגודל 50 ס\"מ × 50 ס\"מ.\n\nכמה אריחים נדרשים לריצוף החדר?",
+        hint: "המירי הכל לאותה יחידה (מטרים או סנטימטרים). שטח חדר ÷ שטח אריח אחד.",
+        method: "area_perimeter",
+        answer_key: "96"
+      },
+      {
+        type: "לוגיקה", time: "7 דק׳",
+        question: "בכיתה יש 32 תלמידים.\nמחציתם אוהבים כדורגל.\nשלושה רבעים מאוהבי הכדורגל גם אוהבים כדורסל.\n\nכמה תלמידים אוהבים גם כדורגל וגם כדורסל?\nכמה תלמידים לא אוהבים כדורגל?",
+        hint: "שלב 1: כמה אוהבים כדורגל? שלב 2: 3/4 מתוכם.",
+        method: "logic",
+        answer_key: "12 ו-16"
+      },
+      {
+        type: "בעיה מורכבת", time: "9 דק׳",
+        question: "לטיול בן 3 ימים הצטרפו 120 תלמידים.\nביום השני נשרו 15% מהתלמידים בגלל מחלה.\nביום השלישי הצטרפו עוד 8 תלמידים.\n\nא. כמה תלמידים היו ביום השני?\nב. כמה תלמידים סיימו את הטיול ביום השלישי?",
+        hint: "יום שני: 15% ירידה = נשאר 85%. יום שלישי: הוסיפי 8.",
+        method: "percent_basic",
+        answer_key: "102 110"
+      },
+      {
+        type: "🎯 שאלת אתגר", time: "12 דק׳",
+        question: "בחנות בגדים:\n• מחיר חולצה: 80 ש\"ח.\n• מחיר מכנסיים: 120 ש\"ח.\n\nבמבצע: קונים 2 פריטים ומקבלים הנחה של 20% על הפריט הזול יותר.\n\nא. רותי קנתה חולצה ומכנסיים. כמה שילמה?\nב. דן קנה 2 חולצות. כמה שילם?\nג. מי שילם פחות, ובכמה?",
+        hint: "ההנחה תמיד על הפריט הזול. בסעיף א: הזול = חולצה (80). בסעיף ב: שתי חולצות זהות — הזולה = כל אחת.",
+        method: "percent_double",
+        answer_key: "184 144 40"
+      },
+      {
+        type: "⭐ בונוס", time: "11 דק׳",
+        question: "בחנות צעצועים יש שלושה סוגי צעצועים:\n• כדור עולה 24 ש\"ח.\n• בובה עולה 60% יותר מכדור.\n• רכבת עולה פי 3 מכדור.\n\nגילה קנתה 2 כדורים, בובה אחת ורכבת אחת.\nהיא שילמה עם שטר של 200 ש\"ח.\n\nא. כמה עולה כל פריט?\nב. כמה שילמה גילה בסך הכל?\nג. כמה עודף קיבלה?",
+        hint: "בובה = כדור + 60% מכדור = 24 + 60% מ-24. רכבת = 3 × 24.",
+        method: "percent_basic",
+        answer_key: "24 38.4 72 158.4 41.6"
+      }
+    ]
+  });
+
+  // תשובות ליום 5
+  solutions["4_0"] = { answer: "✅ 9", ways: [{ label: "פתרון", steps: `<div style='text-align:left;direction:ltr;line-height:2.2'>12 - 3 × 2 + (8 - 5) =<br>12 - 3 × 2 + 3 =<br>12 - 6 + 3 =<br><b>9</b></div>` }] };
+  solutions["4_1"] = { answer: "✅ 99 ש\"ח", ways: [{ label: "טבלת ערך משולש", steps: `הנחה 25% → נשאר 75%:\n? = 75×120÷100 = 90 ש"ח\n\nמע"מ 10% → נשאר 110%:\n? = 110×90÷100 = 99 ש"ח` }] };
+  solutions["4_2"] = { answer: "✅ 40, 53 | איבר 10 = 104", ways: [{ label: "פתרון", steps: `הפרשים: 3,5,7,9,11,13... (+2 כל פעם)\n29+11=40, 40+13=53\nסדרה מלאה: 5,8,13,20,29,40,53,68,85,104\nאיבר 10 = 104` }] };
+  solutions["4_3"] = { answer: "✅ 96 אריחים", ways: [{ label: "פתרון", steps: `שטח חדר = 6×4 = 24 מ"ר = 240,000 ס"מ²\nשטח אריח = 50×50 = 2,500 ס"מ²\n240,000 ÷ 2,500 = 96 אריחים` }] };
+  solutions["4_4"] = { answer: "✅ 12 אוהבים שניהם | 16 לא אוהבים כדורגל", ways: [{ label: "פתרון", steps: `אוהבי כדורגל = 32÷2 = 16\nאוהבי שניהם = 3/4 × 16 = 12\nלא אוהבים כדורגל = 32−16 = 16` }] };
+  solutions["4_5"] = { answer: "✅ א. 102  |  ב. 110", ways: [{ label: "פתרון", steps: `85×120÷100 = 102 תלמידים ביום שני\n102 + 8 = 110 תלמידים ביום שלישי` }] };
+  solutions["4_6"] = { answer: "✅ א. רותי 184 | ב. דן 144 | ג. דן שילם פחות ב-40", ways: [{ label: "פתרון", steps: `א. רותי: מכנסיים 120 + חולצה עם 20% הנחה:\n   80×80÷100 = 64 → 120+64 = 184 ש"ח\n\nב. דן: חולצה 80 + חולצה שנייה עם 20% הנחה:\n   80×80÷100 = 64 → 80+64 = 144 ש"ח\n\nג. 184−144 = 40 ש"ח | דן שילם פחות` }] };
+  solutions["4_7"] = { answer: "✅ כדור=24, בובה=38.4, רכבת=72 | סה\"כ 188.4 | עודף 11.6", ways: [{ label: "פתרון", steps: `א. כדור = 24 ש"ח\n   בובה = 24 + 60%×24 = 24+14.4 = 38.4 ש"ח\n   רכבת = 3×24 = 72 ש"ח\n\nב. גילה קנתה: 2×24 + 38.4 + 72\n   = 48 + 38.4 + 72 = 158.4 ש"ח\n\nג. עודף = 200 − 158.4 = 41.6 ש"ח\n\n💡 שים לב: answer_key מעודכן ל-41.6` }] };
+
+  // ── ANSWER CHECK ────────────────────────────────────────────────
+
+function checkAllMock() {
+  const d = days[4];
+  let correct = 0;
+  d.exercises.forEach((ex, ei) => {
+    if (!ex.answer_key) return;
+    const input = document.getElementById(`ans_4_${ei}`);
+    const result = document.getElementById(`res_4_${ei}`);
+    if (!input) return;
+    const keyNums = ex.answer_key.replace(/[^\d.]/g,' ').trim().split(/\s+/);
+    const userNums = input.value.replace(/[^\d.]/g,' ').trim().split(/\s+/);
+    const isOk = keyNums.every(n => userNums.includes(n));
+    input.className = 'answer-input ' + (isOk ? 'correct' : 'wrong');
+    result.className = 'check-result ' + (isOk ? 'correct' : 'wrong');
+    result.style.display = 'block';
+    result.textContent = isOk ? '✅ נכון!' : '❌ לא מדויק';
+    if (isOk) correct++;
+  });
+  const score = document.getElementById('mock-score');
+  score.style.display = 'block';
+  const total = d.exercises.length;
+  score.textContent = `ציון: ${correct} מתוך ${total} נכון${correct === total ? ' 🎉 מושלם!' : correct >= 4 ? ' 👍 כל הכבוד!' : ' — כדאי לעבור שוב על הפתרונות'}`;
+}
+
+function checkAnswer(dayIdx, exIdx) {
+  const input = document.getElementById(`ans_${dayIdx}_${exIdx}`);
+  const result = document.getElementById(`res_${dayIdx}_${exIdx}`);
+  const ex = days[dayIdx].exercises[exIdx];
+  if (!ex.answer_key || !input) return;
+  const keyNums = ex.answer_key.replace(/[^\d.]/g,' ').trim().split(/\s+/);
+  const userNums = input.value.replace(/[^\d.]/g,' ').trim().split(/\s+/);
+  const isCorrect = keyNums.every(n => userNums.includes(n));
+  input.className = 'answer-input ' + (isCorrect ? 'correct' : 'wrong');
+  result.className = 'check-result ' + (isCorrect ? 'correct' : 'wrong');
+  result.style.display = 'block';
+  result.textContent = isCorrect ? '✅ נכון! כל הכבוד!' : '❌ לא מדויק — נסי שוב, או פתחי רמז.';
+}
+
+function renderContent() {
+  const d = days[activeDay];
+  const isMock = activeDay === 4;
+
+  const exCards = d.exercises.map((ex,ei) => {
+    const solKey = `${activeDay}_${ei}`;
+    const sol = solutions[solKey];
+    const hasCheck = !isMock && !!ex.answer_key;
+    return `
+      <div class="exercise-card">
+        <div class="ex-top">
+          <div class="ex-num">${ei+1}</div>
+          <div class="ex-meta">
+            <div class="ex-type">${ex.type}</div>
+            <div class="ex-time">⏱ ${ex.time}</div>
+          </div>
+        </div>
+        <div class="ex-body">
+          <div class="ex-question">${ex.question}</div>
+          <div class="ex-actions">
+            <button class="btn-hint"   onclick="toggle('hint_${activeDay}_${ei}')">💡 רמז</button>
+            <button class="btn-method" onclick="openMethod('${ex.method}')">📖 שיטת עבודה</button>
+            ${sol ? `<button class="btn-solution" onclick="toggle('sol_${activeDay}_${ei}')">✅ הצג פתרון</button>` : ''}
+          </div>
+        </div>
+        <div class="panel hint-panel" id="hint_${activeDay}_${ei}">${ex.hint}</div>
+        ${hasCheck ? `
+        <div class="answer-check">
+          <input class="answer-input" id="ans_${activeDay}_${ei}" type="text" placeholder="כתבי את התשובה..." />
+          <button class="btn-check" onclick="checkAnswer(${activeDay},${ei})">בדקי ✓</button>
+          <div class="check-result" id="res_${activeDay}_${ei}"></div>
+        </div>` : ''}
+        ${sol ? `
+        <div class="panel solution-panel" id="sol_${activeDay}_${ei}">
+          <div class="sol-answer">${sol.answer}</div>
+          ${sol.ways.map(w => `
+            <div class="sol-way">
+              <div class="sol-way-label">${w.label}</div>
+              <div class="sol-steps">${w.steps}</div>
+            </div>
+          `).join('')}
+        </div>` : ''}
+      </div>`;
+  }).join('');
+
+  // טופס סיכום ליום 5
+  const mockSummary = isMock ? `
+    <div class="exercise-card" style="margin-top:1rem;">
+      <div style="padding:1.25rem;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px;">📋 בדיקת תשובות — מבחן מדומה</div>
+        <div style="font-size:13px;color:#5F5E5A;margin-bottom:1rem;">כתבי את תשובתך לכל שאלה ובדקי הכל בבת אחת</div>
+        ${d.exercises.map((ex,ei) => `
+          <div style="margin-bottom:12px;">
+            <div style="font-size:13px;font-weight:500;margin-bottom:5px;">שאלה ${ei+1} — ${ex.type}</div>
+            <div class="answer-check" style="margin:0">
+              <input class="answer-input" id="ans_${activeDay}_${ei}" type="text" placeholder="תשובה לשאלה ${ei+1}..." />
+              <div class="check-result" id="res_${activeDay}_${ei}"></div>
+            </div>
+          </div>
+        `).join('')}
+        <button class="btn-check" style="width:100%;padding:12px;font-size:15px;margin-top:8px;border-radius:8px" onclick="checkAllMock()">בדקי את כל התשובות ✓</button>
+        <div id="mock-score" style="margin-top:12px;font-size:14px;font-weight:600;text-align:center;display:none;padding:12px;border-radius:8px;background:#E1F5EE;color:#085041;border:0.5px solid #9FE1CB"></div>
+      </div>
+    </div>` : '';
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="day-header-card">
+      <div class="day-header-top">
+        <span class="badge-day ${isMock?'mock':''}">${d.label}</span>
+        <span class="day-title">${d.title}</span>
+      </div>
+      <div class="day-meta">${d.meta}</div>
+      <div class="topics-row">${d.topics.map(t=>`<span class="topic-chip">${t}</span>`).join('')}</div>
+      <div class="day-tip">${d.tip}</div>
+    </div>
+    ${exCards}
+    ${mockSummary}
+  `;
+}
+
+renderTabs();
+renderContent();
+</script>
+</body>
+</html>
