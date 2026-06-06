@@ -278,6 +278,7 @@
 <header>
   <h1>🎯 הכנה למבחן מצטיינים</h1>
   <p>חוף השרון · מתמטיקה · 45 דקות ביום</p>
+  <button id="mockBtn" onclick="showMockScreen()" style="margin-top:10px;padding:8px 20px;background:var(--purple);color:white;border:none;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer">📝 מבחנים לדוגמה</button>
 </header>
 
 <div class="day-tabs" id="dayTabs"></div>
@@ -286,6 +287,27 @@
 </div>
 
 <main id="mainContent"></main>
+
+<!-- MOCK EXAM SCREEN -->
+<div id="mockScreen" style="display:none; padding:1rem; max-width:700px; margin:0 auto;">
+  <div style="display:flex; align-items:center; gap:10px; margin-bottom:1.25rem;">
+    <button onclick="hideMockScreen()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--gray-text)">←</button>
+    <div>
+      <div style="font-size:18px;font-weight:600">📝 מבחנים לדוגמה</div>
+      <div style="font-size:13px;color:var(--gray-text)">כל מבחן כולל את כל הנושאים — 60 דקות</div>
+    </div>
+  </div>
+  <div id="mockGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;"></div>
+</div>
+
+<!-- MOCK EXAM VIEW -->
+<div id="mockExamView" style="display:none; padding:1rem; max-width:700px; margin:0 auto;">
+  <div style="display:flex; align-items:center; gap:10px; margin-bottom:1rem;">
+    <button onclick="backToMockScreen()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--gray-text)">←</button>
+    <div id="mockExamTitle" style="font-size:17px;font-weight:600"></div>
+  </div>
+  <div id="mockExamContent"></div>
+</div>
 
 <!-- METHOD MODAL -->
 <div class="modal-overlay" id="methodModal" onclick="closeModal(event)">
@@ -1485,6 +1507,182 @@ function renderContent() {
 
 renderTabs();
 renderContent();
-</script>
+
+// ── MOCK EXAMS DATA ─────────────────────────────────────────────
+const mockExams = [
+  {
+    id: 'mock1', label: 'מבחן 1',
+    topics: ['אחוזים', 'סדרות', 'שטחים', 'לוגיקה', 'בעיות מורכבות'],
+    exercises: [
+      { type: 'סדר פעולות', time: '5 דק׳', question: 'חשבי (הראי שלבים):\n\n<div style=\'text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd\'>15 - 4 × 3 + (6 - 2) =</div>', hint: 'קודם סוגריים, אחר כך כפל, אחר כך חיבור וחיסור.', method: 'order_of_ops', answer_key: '7' },
+      { type: 'אחוזים', time: '6 דק׳', question: 'מחיר אוזניות 200 ש"ח. במבצע — הנחה של 30%.\n\nא. מה המחיר אחרי ההנחה?\nב. חברה של דנה קנתה אותן ב-154 ש"ח. כמה אחוז הנחה קיבלה?', hint: 'א: נשאר 70%. ב: חסכון = 200−154. כמה אחוז מ-200?', method: 'percent_basic', answer_key: '140 23' },
+      { type: 'חוקיות בסדרות', time: '5 דק׳', question: 'מצאי את החוקיות וכתבי את שני האיברים הבאים:\n\n4, 7, 12, 19, 28, ___, ___\n\nמהו האיבר ה-8?', hint: 'הפרשים: 3,5,7,9... כל פעם גדל ב-2.', method: 'sequences', answer_key: '39 52 79' },
+      { type: 'שטחים והיקפים', time: '7 דק׳', question: 'חדר מלבני שאורכו 8 מ׳ ורוחבו 5 מ׳.\nרוצים להניח שטיח שמכסה 60% מהרצפה.\n\nא. שטח החדר?\nב. שטח השטיח?\nג. שטח רצפה לא מכוסה?', hint: 'א: 8×5. ב: 60% מ-א. ג: א פחות ב.', method: 'area_perimeter', answer_key: '40 24 16' },
+      { type: 'לוגיקה', time: '7 דק׳', question: 'בחנות 3 סוגי ממתקים: שוקולד, סוכריות, מסטיק.\n• שוקולד עולה פי 3 ממסטיק.\n• סוכריות עולות 2 ש"ח יותר ממסטיק.\n• קנת אחד מכל סוג ושילמת 17 ש"ח.\n\nמה מחיר כל סוג?', hint: 'נסי מסטיק=3: שוקולד=9, סוכריות=5. סכום=17 ✓', method: 'logic', answer_key: '3 9 5' },
+      { type: 'בעיה מורכבת', time: '8 דק׳', question: 'חנות ספרים מוכרת ספרים ב-45 ש"ח.\nביום שישי: הנחה של 20%.\nגדי קנה 4 ספרים ביום שישי.\n\nא. מחיר לספר אחד ביום שישי?\nב. כמה שילם גדי?\nג. כמה חסך?', hint: 'א: 80% מ-45. ב: מחיר × 4. ג: מחיר רגיל × 4 פחות ב.', method: 'percent_basic', answer_key: '36 144 36' },
+      { type: '🎯 שאלת אתגר', time: '10 דק׳', question: 'בכיתה 36 תלמידים.\n• 50% לומדים גיטרה.\n• 1/3 מלומדי הגיטרה לומדים גם ציור.\n\nא. כמה לומדים גיטרה?\nב. כמה לומדים גם גיטרה וגם ציור?\nג. כמה לא לומדים גיטרה?', hint: 'א: 50% מ-36. ב: 1/3 מ-א. ג: 36 פחות א.', method: 'logic', answer_key: '18 6 18' },
+      { type: '⭐ בונוס', time: '12 דק׳', question: 'חנות פירות קנתה 80 ק"ג תפוחים ב-3 ש"ח לק"ג.\nמכרה 75% מהתפוחים ב-5 ש"ח לק"ג.\nשאר התפוחים נרקבו.\n\nא. עלות הקנייה?\nב. כמה ק"ג נמכרו?\nג. הכנסה ממכירות?\nד. רווח או הפסד, ובכמה?', hint: 'א: 80×3. ב: 75% מ-80. ג: ק"ג × 5. ד: ג פחות א.', method: 'percent_basic', answer_key: '240 60 300 60' }
+    ]
+  },
+  {
+    id: 'mock2', label: 'מבחן 2',
+    topics: ['סדר פעולות', 'אחוזים', 'גיאומטריה', 'סדרות', 'לוגיקה'],
+    exercises: [
+      { type: 'סדר פעולות', time: '5 דק׳', question: 'חשבי (הראי שלבים):\n\n<div style=\'text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd\'>(8 + 2) × 3 - 4 × 5 =</div>', hint: 'קודם סוגריים, אחר כך שתי פעולות הכפל, אחר כך חיסור.', method: 'order_of_ops', answer_key: '10' },
+      { type: 'אחוזים', time: '7 דק׳', question: 'בעיר גרים 50,000 תושבים.\n• 40% ילדים.\n• 35% מבוגרים מעל 60.\n• השאר — בגיל העבודה.\n\nא. כמה ילדים?\nב. כמה מעל 60?\nג. כמה בגיל העבודה?\nד. כמה אחוז הם?', hint: 'ד: 100% פחות ילדים ומבוגרים.', method: 'percent_basic', answer_key: '20000 17500 12500 25' },
+      { type: 'שטחים והיקפים', time: '7 דק׳', question: 'מגרש ריבועי עם צלע 12 מ׳.\nבמרכזו בריכה עגולה עם קוטר 6 מ׳.\n(שטח עיגול = 3 × r², r = מחצית קוטר)\n\nא. שטח המגרש?\nב. שטח הבריכה?\nג. שטח הדשא?', hint: 'r=3. שטח בריכה = 3×9=27. דשא = מגרש פחות בריכה.', method: 'area_perimeter', answer_key: '144 27 117' },
+      { type: 'חוקיות בסדרות', time: '5 דק׳', question: 'מצאי החוקיות:\n\n1, 4, 16, 64, ___, ___\n\nמהו האיבר ה-7?', hint: 'כל איבר הוא פי 4 מהקודם.', method: 'sequences', answer_key: '256 1024 16384' },
+      { type: 'לוגיקה', time: '7 דק׳', question: 'ארנק כולל שטרות של 10 ש"ח ו-50 ש"ח בלבד.\nיש סה"כ 9 שטרות.\nהסכום הכולל: 170 ש"ח.\n\nכמה שטרות מכל סוג?', hint: 'נסי 2 שטרות של 50: 100+7×10=170 ✓', method: 'logic', answer_key: '7 2' },
+      { type: 'בעיה מורכבת', time: '8 דק׳', question: 'מונית גובה:\n• 10 ש"ח דמי פתיחה.\n• 3 ש"ח לכל ק"מ.\n\nא. כמה עולה נסיעה של 8 ק"מ?\nב. רינה שילמה 40 ש"ח. כמה ק"מ נסעה?\nג. ממוצע לק"מ בנסיעה של 8 ק"מ?', hint: 'ב: 40−10=30. 30÷3=?', method: 'multistep', answer_key: '34 10 4.25' },
+      { type: '🎯 שאלת אתגר', time: '10 דק׳', question: 'חנות מוכרת כיסאות פלסטיק ועץ.\n• פלסטיק: 80 ש"ח. עץ: פי 2.5.\n• נמכרו 12 כיסאות פלסטיק ו-4 כיסאות עץ.\n\nא. מחיר כיסא עץ?\nב. הכנסה מפלסטיק?\nג. הכנסה מעץ?\nד. הכנסה כוללת?', hint: 'א: 2.5×80. ב: 12×80.', method: 'multistep', answer_key: '200 960 800 1760' },
+      { type: '⭐ בונוס', time: '11 דק׳', question: 'גינה מלבנית שאורכה גדול מרוחבה ב-4 מ׳. היקף הגינה: 28 מ׳.\n\nא. מה האורך והרוחב?\n   (רמז: נסי רוחב=5, אורך=9. בדקי!)\nב. שטח הגינה?\nג. גדר עולה 35 ש"ח למטר. מה עלות הגדר?', hint: 'אורך+רוחב=14. רוחב=5,אורך=9: הפרש=4 ✓', method: 'area_perimeter', answer_key: '9 5 45 980' }
+    ]
+  },
+  {
+    id: 'mock3', label: 'מבחן 3',
+    topics: ['אחוזים', 'גיאומטריה', 'סדרות', 'לוגיקה', 'ניתוח נתונים'],
+    exercises: [
+      { type: 'סדר פעולות', time: '5 דק׳', question: 'חשבי (הראי שלבים):\n\n<div style=\'text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd\'>3 × (5 + 2) - 12 ÷ 4 =</div>', hint: 'קודם סוגריים, אחר כך כפל וחילוק, אחר כך חיסור.', method: 'order_of_ops', answer_key: '18' },
+      { type: 'אחוזים', time: '7 דק׳', question: 'מחיר טלפון: 1200 ש"ח.\nאחרי שנה ירד ב-25%.\nשנה אחר כך ירד שוב ב-20% מהמחיר החדש.\n\nא. ערך אחרי שנה ראשונה?\nב. ערך אחרי שנה שנייה?\nג. כמה אחוז ירד בסך הכל מ-1200?', hint: 'א: 75% מ-1200. ב: 80% מ-א. ג: כמה נשאר מ-1200 באחוזים?', method: 'percent_double', answer_key: '900 720 40' },
+      { type: 'שטחים והיקפים', time: '7 דק׳', question: 'גינה מלבנית 10×6 מ׳. סביבה שביל רוחב 2 מ׳. מחוץ לשביל — גדר.\n\nא. שטח הגינה הפנימית?\nב. מה המידות החיצוניות?\nג. היקף הגדר החיצונית?', hint: 'מידות חיצוניות: 10+4=14, 6+4=10.', method: 'area_perimeter', answer_key: '60 14 10 48' },
+      { type: 'חוקיות בסדרות', time: '5 דק׳', question: 'מצאי החוקיות:\n\nא. 2, 6, 18, 54, ___, ___\nב. 50, 45, 39, 32, 24, ___, ___\n   (בדקי את ההפרשים!)', hint: 'א: ×3. ב: הפרשים 5,6,7,8... גדלים ב-1.', method: 'sequences', answer_key: '162 486 15 5' },
+      { type: 'לוגיקה', time: '8 דק׳', question: 'ארבעה חברים: עמי, בתיה, גל, דינה — כל אחד גר בעיר אחרת: תל אביב, חיפה, ירושלים, באר שבע.\n\n• עמי לא גר בצפון ולא בדרום.\n• בתיה גרה בעיר הגדולה ביותר.\n• גל לא גר בירושלים.\n• דינה גרה בדרום.\n\nמי גר איפה?', hint: 'דינה=באר שבע. בתיה=ירושלים. עמי לא חיפה,לא באר שבע,לא ירושלים → תל אביב. גל=חיפה.', method: 'logic', answer_key: 'תל אביב ירושלים חיפה באר שבע' },
+      { type: 'ניתוח נתונים', time: '7 דק׳', question: 'ציוני מבחן של 5 תלמידים: 70, 85, 90, 65, 80.\n\nא. הציון הממוצע?\nב. כמה תלמידים קיבלו מעל הממוצע?\nג. הציון הכי גבוה — כמה אחוז יותר מהנמוך?\n   (הפרש ÷ ציון נמוך × 100)', hint: 'א: סכום ÷ 5. ג: (90−65)÷65×100', method: 'percent_basic', answer_key: '78 3 38.5' },
+      { type: '🎯 שאלת אתגר', time: '10 דק׳', question: 'בתחרות השתתפו 120 ילדים.\n• 60% הגיעו לסיבוב שני.\n• מהסיבוב השני, 50% הגיעו לגמר.\n• בגמר, 25% זכו במדליה.\n\nא. כמה הגיעו לסיבוב שני?\nב. כמה לגמר?\nג. כמה זכו?\nד. כמה אחוז מ-120 זכו?', hint: 'עבדי שלב שלב: א מ-120, ב מ-א, ג מ-ב.', method: 'percent_basic', answer_key: '72 36 9 7.5' },
+      { type: '⭐ בונוס', time: '11 דק׳', question: 'מסעדה:\nינואר — 150 מנות ב-40 ש"ח.\nפברואר — מחיר +10%, כמות −20%.\nמרץ — מחיר −5% מפברואר, כמות +10% מפברואר.\n\nא. הכנסה בינואר?\nב. מחיר וכמות בפברואר?\nג. הכנסה בפברואר?\nד. מחיר וכמות במרץ?\nה. באיזה חודש ההכנסה הגבוהה ביותר?', hint: 'פברואר: 44 ש"ח, 120 מנות. מרץ: 41.8 ש"ח, 132 מנות.', method: 'percent_double', answer_key: '6000 44 120 5280 41.8 132 ינואר' }
+    ]
+  },
+  {
+    id: 'mock4', label: 'מבחן 4',
+    topics: ['כל הנושאים', 'שאלות מאתגרות'],
+    exercises: [
+      { type: 'סדר פעולות', time: '5 דק׳', question: 'חשבי (הראי שלבים):\n\n<div style=\'text-align:left;direction:ltr;font-size:15px;line-height:2.6;margin:10px 0;padding:10px 14px;background:#f7f6f2;border-radius:8px;border:0.5px solid #ddd\'>24 ÷ (2 + 4) × 3 - 1 =</div>', hint: 'קודם סוגריים, חילוק, כפל, חיסור.', method: 'order_of_ops', answer_key: '11' },
+      { type: 'אחוזים', time: '7 דק׳', question: 'מסעדה העלתה מחירים ב-15%.\nמנה עולה עכשיו 69 ש"ח.\n\nא. מה המחיר לפני ההעלאה?\n   (69 הם 115% — בטבלה: 69 בחלק, 115 באחוזים)\nב. ההפרש בשקלים?\nג. 4 אנשים אכלו 4 מנות. כמה שילמו יותר מאשר לפני?', hint: 'א: 69×100÷115. ג: הפרש × 4.', method: 'percent_basic', answer_key: '60 9 36' },
+      { type: 'שטחים והיקפים', time: '7 דק׳', question: 'חצר מלבנית 16×9 מ׳.\nבמרכז — פינת ישיבה ריבועית צלע 3 מ׳.\nשאר החצר מרוצפת.\n\nא. שטח החצר?\nב. שטח פינת הישיבה?\nג. שטח הרצפה המרוצפת?\nד. ריצוף 50 ש"ח למ"ר. עלות?', hint: 'ג: א פחות ב. ד: ג × 50.', method: 'area_perimeter', answer_key: '144 9 135 6750' },
+      { type: 'חוקיות בסדרות', time: '6 דק׳', question: 'מצאי החוקיות:\n\nא. 3, 7, 15, 31, ___, ___\n   (שימי לב לקשר בין כל איבר לקודם)\nב. 1, 1, 2, 3, 5, 8, 13, ___, ___', hint: 'א: ×2+1 כל פעם. ב: פיבונאצ\'י.', method: 'sequences', answer_key: '63 127 21 34' },
+      { type: 'לוגיקה', time: '7 דק׳', question: 'שלוש קופות: א, ב, ג.\n• קופה א — פי 2 מקופה ב.\n• קופה ג — 50 ש"ח פחות מקופה א.\n• סך הכל: 350 ש"ח.\n\nכמה כסף בכל קופה?', hint: 'נסי ב=80: א=160, ג=110. סכום=350 ✓', method: 'logic', answer_key: '80 160 110' },
+      { type: 'ניתוח נתונים', time: '7 דק׳', question: 'ספר עולה 55 ש"ח בחנות א, 48 ש"ח בחנות ב.\nחנות א: קנה 3 קבל 1 חינם.\nחנות ב: 15% הנחה על הכל.\n\nרוצים לקנות 4 ספרים — איפה זול יותר?', hint: 'חנות א: משלמים על 3 בלבד. חנות ב: 4×48×85÷100.', method: 'percent_basic', answer_key: '165 163.2' },
+      { type: '🎯 שאלת אתגר', time: '10 דק׳', question: 'בית ספר קנה שולחנות וכיסאות.\n• לכל שולחן — 4 כיסאות.\n• שולחן: 120 ש"ח. כיסא: 45 ש"ח.\n• קנו 25 שולחנות.\n\nא. כמה כיסאות?\nב. עלות שולחנות?\nג. עלות כיסאות?\nד. הוצאה כוללת?\nה. כמה אחוז ההוצאה על כיסאות?', hint: 'א: 25×4. ב: 25×120. ג: 100×45.', method: 'multistep', answer_key: '100 3000 4500 7500 60' },
+      { type: '⭐ בונוס', time: '11 דק׳', question: 'רכבת נוסעת 360 ק"מ.\nחלק ראשון (40% מהמסלול): 90 ק"מ/שעה.\nחלק שני: 120 ק"מ/שעה.\n(זמן = מרחק ÷ מהירות)\n\nא. כמה ק"מ החלק הראשון?\nב. כמה זמן לקח?\nג. כמה ק"מ החלק השני?\nד. כמה זמן לקח?\nה. זמן כולל?', hint: 'א: 40% מ-360. ב: א÷90. ג: 360−א. ד: ג÷120.', method: 'multistep', answer_key: '144 1.6 216 1.8 3.4' }
+    ]
+  }
+];
+
+// ── MOCK STATE & LOCALSTORAGE ────────────────────────────────────
+let currentMockId = null;
+const DONE_KEY = 'mathPrep_doneMocks';
+
+function getDoneMocks() {
+  try { return JSON.parse(localStorage.getItem(DONE_KEY) || '{}'); } catch { return {}; }
+}
+function markMockDone(id) {
+  const done = getDoneMocks();
+  done[id] = true;
+  localStorage.setItem(DONE_KEY, JSON.stringify(done));
+}
+
+// ── SCREEN MANAGEMENT ────────────────────────────────────────────
+function showMockScreen() {
+  document.getElementById('dayTabs').style.display = 'none';
+  document.querySelector('.progress-wrap').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'none';
+  document.getElementById('mockExamView').style.display = 'none';
+  document.getElementById('mockScreen').style.display = 'block';
+  renderMockGrid();
+}
+function hideMockScreen() {
+  document.getElementById('mockScreen').style.display = 'none';
+  document.getElementById('dayTabs').style.display = 'flex';
+  document.querySelector('.progress-wrap').style.display = 'block';
+  document.getElementById('mainContent').style.display = 'block';
+}
+function backToMockScreen() {
+  document.getElementById('mockExamView').style.display = 'none';
+  document.getElementById('mockScreen').style.display = 'block';
+  renderMockGrid();
+}
+
+// ── RENDER MOCK GRID ─────────────────────────────────────────────
+function renderMockGrid() {
+  const done = getDoneMocks();
+  document.getElementById('mockGrid').innerHTML = mockExams.map(exam => {
+    const isDone = done[exam.id];
+    return `<div onclick="openMockExam('${exam.id}')" style="background:${isDone?'#F4FBF8':'white'};border-radius:10px;padding:1.25rem;border:${isDone?'2px solid var(--green)':'0.5px solid var(--gray-border)'};cursor:pointer;transition:box-shadow 0.15s;position:relative" onmouseover="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='none'">
+      ${isDone?'<div style="position:absolute;top:10px;left:12px;font-size:18px">✅</div>':''}
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:${isDone?'var(--green-deep)':'var(--text)'}">${exam.label}</div>
+      <div style="font-size:12px;color:var(--gray-text);margin-bottom:10px">${exam.exercises.length} שאלות · 60 דקות</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">${exam.topics.map(t=>`<span style="font-size:11px;padding:2px 8px;border-radius:999px;background:var(--gray-bg);border:0.5px solid var(--gray-border);color:var(--gray-text)">${t}</span>`).join('')}</div>
+      <div style="margin-top:10px;font-size:12px;font-weight:500;color:${isDone?'var(--green-deep)':'var(--blue)'}">${isDone?'✔ הושלם':'← לחצי להתחיל'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── OPEN & RENDER MOCK EXAM ──────────────────────────────────────
+function openMockExam(id) {
+  currentMockId = id;
+  const exam = mockExams.find(e => e.id === id);
+  document.getElementById('mockScreen').style.display = 'none';
+  document.getElementById('mockExamView').style.display = 'block';
+  document.getElementById('mockExamTitle').textContent = `📝 ${exam.label} — מבחן מדומה`;
+
+  const exCards = exam.exercises.map((ex,ei) => `
+    <div class="exercise-card">
+      <div class="ex-top">
+        <div class="ex-num">${ei+1}</div>
+        <div class="ex-meta"><div class="ex-type">${ex.type}</div><div class="ex-time">⏱ ${ex.time}</div></div>
+      </div>
+      <div class="ex-body">
+        <div class="ex-question">${ex.question}</div>
+        <div class="ex-actions">
+          <button class="btn-hint" onclick="toggle('mhint_${id}_${ei}')">💡 רמז</button>
+          <button class="btn-method" onclick="openMethod('${ex.method}')">📖 שיטת עבודה</button>
+        </div>
+      </div>
+      <div class="panel hint-panel" id="mhint_${id}_${ei}">${ex.hint}</div>
+    </div>`).join('');
+
+  const summary = `<div class="exercise-card" style="margin-top:1rem;"><div style="padding:1.25rem;">
+    <div style="font-size:15px;font-weight:600;margin-bottom:4px;">📋 בדיקת תשובות</div>
+    <div style="font-size:13px;color:#5F5E5A;margin-bottom:1rem;">כתבי תשובה לכל שאלה ובדקי הכל בבת אחת</div>
+    ${exam.exercises.map((ex,ei)=>`
+      <div style="margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:500;margin-bottom:5px;">שאלה ${ei+1} — ${ex.type}</div>
+        <div class="answer-check" style="margin:0">
+          <input class="answer-input" id="mans_${id}_${ei}" type="text" placeholder="תשובה לשאלה ${ei+1}..."/>
+          <div class="check-result" id="mres_${id}_${ei}"></div>
+        </div>
+      </div>`).join('')}
+    <button class="btn-check" style="width:100%;padding:12px;font-size:15px;margin-top:8px;border-radius:8px" onclick="checkMockExam('${id}')">בדקי את כל התשובות ✓</button>
+    <div id="mscore_${id}" style="margin-top:12px;font-size:14px;font-weight:600;text-align:center;display:none;padding:12px;border-radius:8px;background:#E1F5EE;color:#085041;border:0.5px solid #9FE1CB"></div>
+  </div></div>`;
+
+  document.getElementById('mockExamContent').innerHTML = exCards + summary;
+}
+
+// ── CHECK MOCK EXAM ──────────────────────────────────────────────
+function checkMockExam(id) {
+  const exam = mockExams.find(e => e.id === id);
+  let correct = 0;
+  exam.exercises.forEach((ex,ei) => {
+    if (!ex.answer_key) return;
+    const input  = document.getElementById(`mans_${id}_${ei}`);
+    const result = document.getElementById(`mres_${id}_${ei}`);
+    if (!input) return;
+    const keyNums  = ex.answer_key.replace(/[^\d.]/g,' ').trim().split(/\s+/);
+    const userNums = input.value.replace(/[^\d.]/g,' ').trim().split(/\s+/);
+    const isOk = keyNums.every(n => userNums.includes(n));
+    input.className  = 'answer-input ' + (isOk?'correct':'wrong');
+    result.className = 'check-result '  + (isOk?'correct':'wrong');
+    result.style.display = 'block';
+    result.textContent = isOk ? '✅ נכון!' : '❌ לא מדויק';
+    if (isOk) correct++;
+  });
+  const score = document.getElementById(`mscore_${id}`);
+  score.style.display = 'block';
+  const total = exam.exercises.length;
+  const pct = Math.round(correct/total*100);
+  score.textContent = `ציון: ${correct} מתוך ${total} (${pct}%)${correct===total?' 🎉 מושלם!':correct>=Math.ceil(total*0.7)?' 👍 כל הכבוד!':' — כדאי לחזור על הפתרונות'}`;
+  markMockDone(id);
+}</script>
 </body>
 </html>
